@@ -39,7 +39,7 @@ class UserController extends Controller {
   }
 
   get_search_DSL() {
-    return {
+    const DSL = {
       query: {
         fuzzy: {
           username: {
@@ -49,6 +49,7 @@ class UserController extends Controller {
         },
       },
     };
+    return this.sort(DSL);
   }
 
   wrap_search_result(result) {

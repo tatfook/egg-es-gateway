@@ -65,20 +65,17 @@ class ProjectController extends Controller {
   }
 
   get_search_DSL() {
-    return {
+    const DSL = {
       query: {
         match: {
           name: this.ctx.query.q,
         },
       },
-      highlight: {
-        fields: {
-          name: {},
-        },
-        pre_tags: '<span>',
-        post_tags: '</span>',
-      },
     };
+    const highlight_tag = this.config.highlight_tag;
+    this.highlight(DSL, highlight_tag, 'name');
+    this.sort(DSL);
+    return DSL;
   }
 
   wrap_search_result(result) {

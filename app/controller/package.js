@@ -45,20 +45,17 @@ class PackageController extends Controller {
   }
 
   get_search_DSL() {
-    return {
+    const DSL = {
       query: {
         match: {
           title: this.ctx.query.q,
         },
       },
-      highlight: {
-        fields: {
-          title: {},
-        },
-        pre_tags: '<span>',
-        post_tags: '</span>',
-      },
     };
+    const highlight_tag = this.config.highlight_tag;
+    this.highlight(DSL, highlight_tag, 'title');
+    this.sort(DSL);
+    return DSL;
   }
 
   wrap_search_result(result) {

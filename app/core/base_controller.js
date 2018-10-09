@@ -69,6 +69,29 @@ class Base_controllerController extends Controller {
     this.deleted();
   }
 
+  highlight(DSL, tag, ... fields) {
+    if (fields.length > 0) {
+      DSL.highlight = {
+        fields: {},
+        pre_tags: `<${tag}>`,
+        post_tags: `</${tag}>`,
+      };
+      for (const field of fields) {
+        DSL.highlight.fields[field] = {};
+      }
+    }
+    return DSL;
+  }
+
+  sort(DSL) {
+    if (this.ctx.query.sort) {
+      DSL.sort = [{
+        [this.ctx.query.sort]: { order: this.ctx.query.order || 'desc' },
+      }];
+    }
+    return DSL;
+  }
+
   success(action = 'success') {
     this.ctx.body = {};
     this.ctx.body[action] = true;
