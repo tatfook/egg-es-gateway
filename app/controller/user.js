@@ -51,11 +51,14 @@ class UserController extends Controller {
   }
 
   wrap_search_result(result) {
-    return result.hits.hits.map(hit => {
-      hit._source._score = hit._score;
-      hit._source.suggestions = undefined;
-      return hit._source;
-    });
+    return {
+      hits: result.hits.hits.map(hit => {
+        hit._source._score = hit._score;
+        hit._source.suggestions = undefined;
+        return hit._source;
+      }),
+      total: result.hits.total,
+    };
   }
 }
 

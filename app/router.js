@@ -12,4 +12,5 @@ module.exports = app => {
 
   router.resources('/users', controller.user);
   router.resources('/packages', controller.package);
+  router.resources('/projects', controller.project);
 };
