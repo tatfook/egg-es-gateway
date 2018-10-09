@@ -3,6 +3,7 @@
 const Controller = require('../core/base_controller');
 
 const create_rule = {
+  id: 'int',
   username: { type: 'string', min: 4, max: 30 },
   portrait: 'url',
 };
@@ -16,11 +17,11 @@ const update_rule = {
 class UserController extends Controller {
   async create() {
     this.ctx.validate(create_rule);
-    const { username, portrait } = this.ctx.request.body;
+    const { id, username, portrait } = this.ctx.request.body;
     const pinyin = this.ctx.helper.hanzi_to_pinyin(username);
     const suggestions = [ username, pinyin ];
     const data = { username, portrait, suggestions };
-    const payload = { id: username, body: data };
+    const payload = { id, body: data };
     await super.create(payload);
   }
 

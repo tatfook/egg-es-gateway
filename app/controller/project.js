@@ -3,7 +3,7 @@
 const Controller = require('../core/base_controller');
 
 const create_rule = {
-  id: 'id',
+  id: 'int',
   name: 'string',
   cover: 'url',
   username: 'string',
@@ -22,6 +22,7 @@ const update_rule = {
   total_mark: { type: 'int', required: false },
   total_comment: { type: 'int', required: false },
   recent_search: { type: 'int', required: false },
+  recent_like: { type: 'int', required: false },
   recent_view: { type: 'int', required: false },
 };
 
@@ -29,12 +30,14 @@ class ProjectController extends Controller {
   async create() {
     this.ctx.validate(create_rule);
     const {
-      id, name, cover, username, user_portrait, visibility, type, recruiting, created_time,
+      id, name, cover, username, user_portrait,
+      visibility, type, recruiting, created_time,
     } = this.ctx.request.body;
     const pinyin = this.ctx.helper.hanzi_to_pinyin(name);
     const suggestions = [ name, pinyin ];
     const data = {
-      name, cover, username, user_portrait, visibility, type, recruiting, created_time, suggestions,
+      name, cover, username, user_portrait, visibility,
+      type, recruiting, created_time, suggestions,
     };
     const payload = { id, body: data };
     await super.create(payload);
@@ -43,12 +46,14 @@ class ProjectController extends Controller {
   async update() {
     this.ctx.validate(update_rule);
     const {
-      cover, user_portrait, total_like, total_view,
-      total_mark, total_comment, recent_search, recent_view,
+      cover, user_portrait, total_like,
+      total_view, total_mark, total_comment,
+      recent_search, recent_like, recent_view,
     } = this.ctx.request.body;
     const data = { doc: {
-      cover, user_portrait, total_like, total_view,
-      total_mark, total_comment, recent_search, recent_view,
+      cover, user_portrait, total_like,
+      total_view, total_mark, total_comment,
+      recent_search, recent_like, recent_view,
     } };
     const payload = { id: this.ctx.params.id, body: data };
     await super.update(payload);
@@ -68,7 +73,7 @@ class ProjectController extends Controller {
       },
       highlight: {
         fields: {
-          title: {},
+          name: {},
         },
         pre_tags: '<span>',
         post_tags: '</span>',
