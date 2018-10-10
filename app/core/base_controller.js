@@ -16,8 +16,17 @@ class Base_controllerController extends Controller {
 
   async index() {
     this.ctx.validate(search_rule, this.ctx.query);
+    await this.search();
+  }
+
+  async rank(field, order = 'desc') {
+    const DSL = this.get_rank_DSL(field, order);
+    await this.search(DSL);
+  }
+
+  async search(DSL = this.get_search_DSL()) {
     const [ from, size ] = this.ctx.helper.paginate(this.ctx.query);
-    const query = { from, size, body: this.get_search_DSL() };
+    const query = { from, size, body: DSL };
     const query_with_location = this.add_location(query);
     const result = await this.service.es.client.search(query_with_location)
       .catch(err => {
@@ -69,7 +78,8 @@ class Base_controllerController extends Controller {
     this.deleted();
   }
 
-  highlight(DSL, tag, ... fields) {
+  highlight(DSL, ... fields) {
+    const tag = this.config.highlight_tag;
     if (fields.length > 0) {
       DSL.highlight = {
         fields: {},
@@ -83,12 +93,17 @@ class Base_controllerController extends Controller {
     return DSL;
   }
 
-  sort(DSL) {
-    if (this.ctx.query.sort) {
+  sort(DSL = {}, field = this.ctx.query.sort, order = this.ctx.query.order) {
+    if (field) {
       DSL.sort = [{
-        [this.ctx.query.sort]: { order: this.ctx.query.order || 'desc' },
+        [field]: { order: order || 'desc' },
       }];
     }
+    return DSL;
+  }
+
+  get_rank_DSL(field, order) {
+    const DSL = this.sort({}, field, order);
     return DSL;
   }
 

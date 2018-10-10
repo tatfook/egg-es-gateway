@@ -39,9 +39,7 @@ class SiteController extends Controller {
 
   async update() {
     this.ctx.validate(update_rule);
-    const {
-      sitename, cover, display_name, desc,
-    } = this.ctx.request.body;
+    const { sitename, cover, display_name, desc } = this.ctx.request.body;
     const data = { doc: { cover, display_name, desc } };
     if (display_name) {
       if (!sitename) {
@@ -80,8 +78,7 @@ class SiteController extends Controller {
         },
       },
     };
-    const highlight_tag = this.config.highlight_tag;
-    this.highlight(DSL, highlight_tag, 'sitename', 'display_name');
+    this.highlight(DSL, 'sitename', 'display_name');
     this.sort(DSL);
     return this.sort(DSL);
   }

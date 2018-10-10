@@ -14,4 +14,9 @@ module.exports = app => {
   router.resources('/packages', controller.package);
   router.resources('/projects', controller.project);
   router.resources('/sites', controller.site);
+
+  router.get('/hots/projects', controller.project.hots);
+  router.get('/likes/projects', controller.project.likes);
+
+  router.get('/hots/packages', controller.package.hots);
 };

@@ -33,6 +33,14 @@ const update_rule = {
 };
 
 class ProjectController extends Controller {
+  async hots() {
+    await this.rank('recent_view');
+  }
+
+  async likes() {
+    await this.rank('recent_like');
+  }
+
   async create() {
     this.ctx.validate(create_rule);
     const {
@@ -81,6 +89,14 @@ class ProjectController extends Controller {
     return super.add_location(payload, data_type);
   }
 
+  get_rank_DSL(field, order) {
+    const DSL = this.sort({}, field, order);
+    DSL.query = {
+      bool: { must_not: { term: { visibility: 'private' } } },
+    };
+    return DSL;
+  }
+
   get_search_DSL() {
     const DSL = {
       query: {
@@ -90,8 +106,7 @@ class ProjectController extends Controller {
         },
       },
     };
-    const highlight_tag = this.config.highlight_tag;
-    this.highlight(DSL, highlight_tag, 'name');
+    this.highlight(DSL, 'name');
     this.sort(DSL);
     return DSL;
   }
