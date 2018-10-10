@@ -74,14 +74,15 @@ class SiteController extends Controller {
   get_search_DSL() {
     const DSL = {
       query: {
-        fuzzy: {
-          username: {
-            value: this.ctx.query.q,
-            fuzziness: 'AUTO',
-          },
+        multi_match: {
+          query: this.ctx.query.q,
+          fields: [ 'sitename', 'display_name' ],
         },
       },
     };
+    const highlight_tag = this.config.highlight_tag;
+    this.highlight(DSL, highlight_tag, 'sitename', 'display_name');
+    this.sort(DSL);
     return this.sort(DSL);
   }
 
@@ -89,6 +90,7 @@ class SiteController extends Controller {
     return {
       hits: result.hits.hits.map(hit => {
         hit._source._score = hit._score;
+        hit._source.highlight = hit.highlight;
         hit._source.suggestions = undefined;
         return hit._source;
       }),

@@ -12,7 +12,7 @@ const create_rule = {
   type: 'string',
   recruiting: 'bool',
   created_time: 'datetime',
-  tags: { type: 'array', itemType: 'string' },
+  tags: { type: 'array', itemType: 'string', required: false },
 };
 
 const update_rule = {
@@ -84,8 +84,9 @@ class ProjectController extends Controller {
   get_search_DSL() {
     const DSL = {
       query: {
-        match: {
-          name: this.ctx.query.q,
+        bool: {
+          must: { match: { name: this.ctx.query.q } },
+          must_not: { term: { visibility: 'private' } },
         },
       },
     };
