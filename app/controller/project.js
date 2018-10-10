@@ -39,8 +39,7 @@ class ProjectController extends Controller {
       id, name, cover, username, user_portrait,
       visibility, type, recruiting, created_time, tags,
     } = this.ctx.request.body;
-    const pinyin = this.ctx.helper.hanzi_to_pinyin(name);
-    const suggestions = [ name, pinyin ];
+    const suggestions = this.get_suggestions();
     const data = {
       name, cover, username, user_portrait, visibility,
       type, recruiting, created_time, tags, suggestions,
@@ -64,12 +63,17 @@ class ProjectController extends Controller {
       recent_view, recruiting, tags,
     } };
     if (name) {
-      const pinyin = this.ctx.helper.hanzi_to_pinyin(name);
-      const suggestions = [ name, pinyin ];
-      data.doc.suggestions = suggestions;
+      data.doc.suggestions = this.get_suggestions();
     }
     const payload = { id: this.ctx.params.id, body: data };
     await super.update(payload);
+  }
+
+  get_suggestions() {
+    const { name } = this.ctx.request.body;
+    const pinyin = this.ctx.helper.hanzi_to_pinyin(name);
+    const suggestions = [ name, pinyin ];
+    return suggestions;
   }
 
   add_location(payload) {

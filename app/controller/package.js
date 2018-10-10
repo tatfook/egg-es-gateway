@@ -29,8 +29,7 @@ class PackageController extends Controller {
       id, title, cover, total_lessons,
       description, age_min, age_max,
     } = this.ctx.request.body;
-    const pinyin = this.ctx.helper.hanzi_to_pinyin(title);
-    const suggestions = [ title, pinyin ];
+    const suggestions = this.get_suggestions();
     const data = {
       title, cover, total_lessons,
       description, age_min, age_max, suggestions,
@@ -50,12 +49,17 @@ class PackageController extends Controller {
       description, recent_view, age_min, age_max,
     } };
     if (title) {
-      const pinyin = this.ctx.helper.hanzi_to_pinyin(title);
-      const suggestions = [ title, pinyin ];
-      data.doc.suggestions = suggestions;
+      data.doc.suggestions = this.get_suggestions();
     }
     const payload = { id: this.ctx.params.id, body: data };
     await super.update(payload);
+  }
+
+  get_suggestions() {
+    const { title } = this.ctx.request.body;
+    const pinyin = this.ctx.helper.hanzi_to_pinyin(title);
+    const suggestions = [ title, pinyin ];
+    return suggestions;
   }
 
   add_location(payload) {
