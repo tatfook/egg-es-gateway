@@ -5,18 +5,23 @@ const Controller = require('../core/base_controller');
 const create_rule = {
   id: 'int',
   name: 'string',
-  cover: 'url',
+  cover: 'string',
   username: 'string',
-  user_portrait: 'url',
+  user_portrait: 'string',
   visibility: [ 'public', 'private' ],
   type: 'string',
   recruiting: 'bool',
   created_time: 'datetime',
+  tags: { type: 'array', itemType: 'string' },
 };
 
 const update_rule = {
-  cover: { type: 'url', required: false },
-  user_portrait: { type: 'url', required: false },
+  name: { type: 'string', required: false },
+  cover: { type: 'string', required: false },
+  user_portrait: { type: 'string', required: false },
+  visibility: { type: 'enum', values: [ 'public', 'private' ], required: false },
+  type: { type: 'string', required: false },
+  recruiting: { type: 'boolean', required: false },
   total_like: { type: 'int', required: false },
   total_view: { type: 'int', required: false },
   total_mark: { type: 'int', required: false },
@@ -24,6 +29,7 @@ const update_rule = {
   recent_search: { type: 'int', required: false },
   recent_like: { type: 'int', required: false },
   recent_view: { type: 'int', required: false },
+  tags: { type: 'array', itemType: 'string', required: false },
 };
 
 class ProjectController extends Controller {
@@ -31,13 +37,13 @@ class ProjectController extends Controller {
     this.ctx.validate(create_rule);
     const {
       id, name, cover, username, user_portrait,
-      visibility, type, recruiting, created_time,
+      visibility, type, recruiting, created_time, tags,
     } = this.ctx.request.body;
     const pinyin = this.ctx.helper.hanzi_to_pinyin(name);
     const suggestions = [ name, pinyin ];
     const data = {
       name, cover, username, user_portrait, visibility,
-      type, recruiting, created_time, suggestions,
+      type, recruiting, created_time, tags, suggestions,
     };
     const payload = { id, body: data };
     await super.create(payload);
@@ -46,15 +52,22 @@ class ProjectController extends Controller {
   async update() {
     this.ctx.validate(update_rule);
     const {
-      cover, user_portrait, total_like,
-      total_view, total_mark, total_comment,
-      recent_search, recent_like, recent_view,
+      name, cover, user_portrait, total_like,
+      visibility, type, total_view, total_mark,
+      total_comment, recent_search, recent_like,
+      recent_view, recruiting, tags,
     } = this.ctx.request.body;
     const data = { doc: {
-      cover, user_portrait, total_like,
-      total_view, total_mark, total_comment,
-      recent_search, recent_like, recent_view,
+      name, cover, user_portrait, total_like,
+      visibility, type, total_view, total_mark,
+      total_comment, recent_search, recent_like,
+      recent_view, recruiting, tags,
     } };
+    if (name) {
+      const pinyin = this.ctx.helper.hanzi_to_pinyin(name);
+      const suggestions = [ name, pinyin ];
+      data.doc.suggestions = suggestions;
+    }
     const payload = { id: this.ctx.params.id, body: data };
     await super.update(payload);
   }

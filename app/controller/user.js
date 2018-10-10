@@ -5,11 +5,11 @@ const Controller = require('../core/base_controller');
 const create_rule = {
   id: 'int',
   username: { type: 'string', min: 4, max: 30 },
-  portrait: 'url',
+  portrait: 'string',
 };
 
 const update_rule = {
-  portrait: { type: 'url', required: false },
+  portrait: { type: 'string', required: false },
   total_projects: { type: 'int', required: false },
   total_fans: { type: 'int', required: false },
 };
