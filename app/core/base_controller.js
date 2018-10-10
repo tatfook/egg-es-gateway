@@ -48,6 +48,7 @@ class Base_controllerController extends Controller {
   }
 
   async create(payload) {
+    this.ctx.ensureAdmin();
     const payload_with_location = this.add_location(payload);
     await this.service.es.client.create(payload_with_location)
       .catch(err => {
@@ -58,6 +59,7 @@ class Base_controllerController extends Controller {
   }
 
   async update(payload) {
+    this.ctx.ensureAdmin();
     const payload_with_location = this.add_location(payload);
     await this.service.es.client.update(payload_with_location)
       .catch(err => {
@@ -68,6 +70,7 @@ class Base_controllerController extends Controller {
   }
 
   async destroy() {
+    this.ctx.ensureAdmin();
     const query = this.ctx.params;
     const query_with_location = this.add_location(query);
     await this.service.es.client.delete(query_with_location)
