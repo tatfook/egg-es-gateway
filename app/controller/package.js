@@ -22,6 +22,16 @@ const update_rule = {
   age_max: { type: 'int', required: false },
 };
 
+const upsert_rule = {
+  title: 'string',
+  cover: 'string',
+  total_lessons: { type: 'int', required: false },
+  description: { type: 'string', required: false, allowEmpty: true },
+  age_min: { type: 'int', required: false },
+  age_max: { type: 'int', required: false },
+  recent_view: { type: 'int', required: false },
+};
+
 class PackageController extends Controller {
   async hots() {
     await this.rank('recent_view');
@@ -57,6 +67,22 @@ class PackageController extends Controller {
     }
     const payload = { id: this.ctx.params.id, body: data };
     await super.update(payload);
+  }
+
+  async upsert() {
+    this.ctx.validate(upsert_rule);
+    const {
+      title, cover, total_lessons,
+      description, age_min, age_max,
+      recent_view,
+    } = this.ctx.request.body;
+    const suggestions = this.get_suggestions();
+    const data = {
+      title, cover, total_lessons, description,
+      age_min, age_max, recent_view, suggestions,
+    };
+    const payload = { id: this.ctx.params.id, body: data };
+    await super.upsert(payload);
   }
 
   get_suggestions() {

@@ -69,6 +69,17 @@ class Base_controllerController extends Controller {
     this.updated();
   }
 
+  async upsert(payload) {
+    this.ctx.ensureAdmin();
+    const payload_with_location = this.add_location(payload);
+    await this.service.es.client.index(payload_with_location)
+      .catch(err => {
+        this.ctx.logger.error(err);
+        this.ctx.throw(err.statusCode);
+      });
+    this.upserted();
+  }
+
   async destroy() {
     this.ctx.ensureAdmin();
     const query = this.ctx.params;
@@ -123,6 +134,11 @@ class Base_controllerController extends Controller {
   updated() {
     this.success('updated');
   }
+
+  upserted() {
+    this.success('upserted');
+  }
+
 
   deleted() {
     this.success('deleted');
