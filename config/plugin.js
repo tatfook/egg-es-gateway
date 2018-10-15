@@ -11,7 +11,7 @@ exports.cors = {
   package: 'egg-cors',
 };
 
-exports.jwt = {
-  enable: true,
-  package: 'egg-jwt',
-};
+// exports.jwt = {
+//   enable: true,
+//   package: 'egg-jwt',
+// };
