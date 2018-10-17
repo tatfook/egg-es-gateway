@@ -5,20 +5,16 @@ const Controller = require('../core/base_controller');
 const create_rule = {
   id: 'int',
   name: 'string',
-  cover: 'string',
   username: 'string',
-  user_portrait: 'string',
   visibility: [ 'public', 'private' ],
   type: 'string',
   recruiting: 'bool',
-  created_time: 'datetime',
+  created_time: 'string',
   tags: { type: 'array', itemType: 'string', required: false },
 };
 
 const update_rule = {
   name: { type: 'string', required: false },
-  cover: { type: 'string', required: false },
-  user_portrait: { type: 'string', required: false },
   visibility: { type: 'enum', values: [ 'public', 'private' ], required: false },
   type: { type: 'string', required: false },
   recruiting: { type: 'boolean', required: false },
@@ -33,13 +29,11 @@ const update_rule = {
 
 const upsert_rule = {
   name: 'string',
-  cover: 'string',
   username: 'string',
-  user_portrait: 'string',
   visibility: [ 'public', 'private' ],
   type: 'string',
   recruiting: 'bool',
-  created_time: 'datetime',
+  created_time: 'string',
   tags: { type: 'array', itemType: 'string', required: false },
   total_like: { type: 'int', required: false },
   total_view: { type: 'int', required: false },
