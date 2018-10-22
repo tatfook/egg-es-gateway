@@ -94,14 +94,13 @@ class SiteController extends Controller {
   }
 
   get_search_DSL() {
-    const DSL = {
-      query: {
-        multi_match: {
-          query: this.ctx.query.q,
-          fields: [ 'sitename', 'display_name' ],
-        },
-      },
-    };
+    const DSL = { query: {} };
+    if (this.ctx.query.q) {
+      DSL.query.multi_match = {
+        query: this.ctx.query.q,
+        fields: [ 'sitename', 'display_name' ],
+      };
+    }
     this.highlight(DSL, 'sitename', 'display_name');
     this.sort(DSL);
     return this.sort(DSL);

@@ -2,10 +2,6 @@
 
 const Controller = require('egg').Controller;
 
-const search_rule = {
-  q: 'string',
-};
-
 class Base_controllerController extends Controller {
   add_location(payload, data_type) {
     const { index, type } = this.config.elasticsearch.locations[data_type];
@@ -15,7 +11,6 @@ class Base_controllerController extends Controller {
   }
 
   async index() {
-    this.ctx.validate(search_rule, this.ctx.query);
     await this.search();
   }
 
@@ -91,6 +86,23 @@ class Base_controllerController extends Controller {
       });
     this.deleted();
   }
+
+  // async count_key_word() {
+  //   const data = {
+  //     script: 'ctx._source.recent_search += 1',
+  //     upsert: {
+  //       recent_search: 1,
+  //       keyword: this.ctx.query.q,
+  //     },
+  //   };
+  //   const payload = { id: this.ctx.query.q, body: data };
+  //   const payload_with_location = this.add_location(payload);
+  //   await this.service.es.client.update(payload_with_location)
+  //     .catch(err => {
+  //       this.ctx.logger.error(err);
+  //       this.ctx.throw(err.statusCode);
+  //     });
+  // }
 
   highlight(DSL, ... fields) {
     const tag = this.config.highlight_tag;

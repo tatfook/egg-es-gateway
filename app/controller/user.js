@@ -59,16 +59,15 @@ class UserController extends Controller {
   }
 
   get_search_DSL() {
-    const DSL = {
-      query: {
-        fuzzy: {
-          username: {
-            value: this.ctx.query.q,
-            fuzziness: 'AUTO',
-          },
+    const DSL = { query: {} };
+    if (this.ctx.query.q) {
+      DSL.query.fuzzy = {
+        username: {
+          value: this.ctx.query.q,
+          fuzziness: 'AUTO',
         },
-      },
-    };
+      };
+    }
     return this.sort(DSL);
   }
 

@@ -131,11 +131,20 @@ class ProjectController extends Controller {
     const DSL = {
       query: {
         bool: {
-          must: { match: { name: this.ctx.query.q } },
+          must: [],
           must_not: { term: { visibility: 'private' } },
         },
       },
     };
+    if (this.ctx.query.q) {
+      DSL.query.bool.must.push({ match: { name: this.ctx.query.q } });
+    }
+    if (this.ctx.query.type) {
+      DSL.query.bool.must.push({ term: { type: this.ctx.query.type } });
+    }
+    if (this.ctx.query.tags) {
+      DSL.query.bool.must.push({ term: { tags: this.ctx.query.tags } });
+    }
     this.highlight(DSL, 'name');
     this.sort(DSL);
     return DSL;

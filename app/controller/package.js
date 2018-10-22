@@ -98,13 +98,10 @@ class PackageController extends Controller {
   }
 
   get_search_DSL() {
-    const DSL = {
-      query: {
-        match: {
-          title: this.ctx.query.q,
-        },
-      },
-    };
+    const DSL = { query: {} };
+    if (this.ctx.query.q) {
+      DSL.query.match = { title: this.ctx.query.q };
+    }
     this.highlight(DSL, 'title');
     this.sort(DSL);
     return DSL;
