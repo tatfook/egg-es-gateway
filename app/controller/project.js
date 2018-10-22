@@ -147,6 +147,9 @@ class ProjectController extends Controller {
     if (this.ctx.query.tags) {
       DSL.query.bool.must.push({ term: { tags: this.ctx.query.tags } });
     }
+    if (this.ctx.query.recruiting) {
+      DSL.query.bool.must.push({ term: { recruiting: true } });
+    }
     this.highlight(DSL, 'name');
     this.sort(DSL);
     return DSL;
