@@ -158,6 +158,7 @@ class ProjectController extends Controller {
   wrap_search_result(result) {
     return {
       hits: result.hits.hits.map(hit => {
+        hit._source.id = Number(hit._id);
         hit._source._score = hit._score;
         hit._source.highlight = hit.highlight;
         hit._source.suggestions = undefined;
