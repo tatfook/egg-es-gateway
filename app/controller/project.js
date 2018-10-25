@@ -9,8 +9,8 @@ const create_rule = {
   visibility: [ 'public', 'private' ],
   type: 'string',
   recruiting: 'bool',
-  created_time: 'string',
   tags: { type: 'array', itemType: 'string', required: false },
+  created_time: 'string',
 };
 
 const update_rule = {
@@ -19,13 +19,13 @@ const update_rule = {
   type: { type: 'string', required: false },
   recruiting: { type: 'boolean', required: false },
   tags: { type: 'array', itemType: 'string', required: false },
-  updated_time: 'string',
   total_like: { type: 'int', required: false },
   total_view: { type: 'int', required: false },
   total_mark: { type: 'int', required: false },
   total_comment: { type: 'int', required: false },
   recent_like: { type: 'int', required: false },
   recent_view: { type: 'int', required: false },
+  updated_time: 'string',
 };
 
 const upsert_rule = {
@@ -34,8 +34,6 @@ const upsert_rule = {
   visibility: [ 'public', 'private' ],
   type: 'string',
   recruiting: 'bool',
-  created_time: 'string',
-  updated_time: { type: 'string', required: false },
   tags: { type: 'array', itemType: 'string', required: false },
   total_like: { type: 'int', required: false },
   total_view: { type: 'int', required: false },
@@ -43,6 +41,8 @@ const upsert_rule = {
   total_comment: { type: 'int', required: false },
   recent_like: { type: 'int', required: false },
   recent_view: { type: 'int', required: false },
+  created_time: 'string',
+  updated_time: { type: 'string', required: false },
 };
 
 class ProjectController extends Controller {
@@ -65,6 +65,7 @@ class ProjectController extends Controller {
       name, cover, username, user_portrait, visibility,
       type, recruiting, created_time, tags, suggestions,
     };
+    data.updated_time = data.updated_time || data.created_time;
     const payload = { id, body: data };
     await super.create(payload);
   }
@@ -105,6 +106,7 @@ class ProjectController extends Controller {
       total_like, total_view, total_mark, total_comment,
       recent_like, recent_view,
     };
+    data.updated_time = data.updated_time || data.created_time;
     const payload = { id: this.ctx.params.id, body: data };
     await super.upsert(payload);
   }

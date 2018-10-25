@@ -5,39 +5,35 @@ const Controller = require('../core/base_controller');
 const create_rule = {
   id: 'int',
   title: 'string',
-  cover: { type: 'string', required: false },
   prize: { type: 'int', required: false },
   total_lessons: { type: 'int', required: false },
   description: { type: 'string', required: false, allowEmpty: true },
   age_min: { type: 'int', required: false },
   age_max: { type: 'int', required: false },
-  created_time: { type: 'string', required: false },
+  created_time: 'string',
   updated_time: { type: 'string', required: false },
 };
 
 const update_rule = {
   title: { type: 'string', required: false },
-  cover: { type: 'string', required: false },
   prize: { type: 'int', required: false },
   total_lessons: { type: 'int', required: false },
   description: { type: 'string', required: false, allowEmpty: true },
   recent_view: { type: 'int', required: false },
   age_min: { type: 'int', required: false },
   age_max: { type: 'int', required: false },
-  created_time: { type: 'string', required: false },
-  updated_time: { type: 'string', required: false },
+  updated_time: 'string',
 };
 
 const upsert_rule = {
   title: 'string',
-  cover: { type: 'string', required: false },
   prize: { type: 'int', required: false },
   total_lessons: { type: 'int', required: false },
   description: { type: 'string', required: false, allowEmpty: true },
   age_min: { type: 'int', required: false },
   age_max: { type: 'int', required: false },
   recent_view: { type: 'int', required: false },
-  created_time: { type: 'string', required: false },
+  created_time: 'string',
   updated_time: { type: 'string', required: false },
 };
 
@@ -59,6 +55,7 @@ class PackageController extends Controller {
       description, age_min, age_max, suggestions,
       created_time, updated_time,
     };
+    data.updated_time = data.updated_time || data.created_time;
     const payload = { id, body: data };
     await super.create(payload);
   }
@@ -95,6 +92,7 @@ class PackageController extends Controller {
       age_min, age_max, recent_view, suggestions,
       created_time, updated_time,
     };
+    data.updated_time = data.updated_time || data.created_time;
     const payload = { id: this.ctx.params.id, body: data };
     await super.upsert(payload);
   }
