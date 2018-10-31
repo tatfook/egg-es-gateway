@@ -6,14 +6,14 @@ const create_rule = {
   id: 'int',
   username: { type: 'string', min: 4, max: 30 },
   sitename: 'string',
-  cover: 'string',
+  cover: { type: 'string', required: false, allowEmpty: true },
   display_name: { type: 'string', required: false, allowEmpty: true },
   desc: { type: 'string', required: false, allowEmpty: true },
 };
 
 const update_rule = {
   sitename: { type: 'string', required: false },
-  cover: { type: 'string', required: false },
+  cover: { type: 'string', required: false, allowEmpty: true },
   display_name: { type: 'string', required: false, allowEmpty: true },
   desc: { type: 'string', required: false, allowEmpty: true },
 };
@@ -21,7 +21,7 @@ const update_rule = {
 const upsert_rule = {
   username: { type: 'string', min: 4, max: 30 },
   sitename: 'string',
-  cover: 'string',
+  cover: { type: 'string', required: false, allowEmpty: true },
   display_name: { type: 'string', required: false, allowEmpty: true },
   desc: { type: 'string', required: false, allowEmpty: true },
 };
