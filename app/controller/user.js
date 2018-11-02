@@ -12,6 +12,7 @@ const update_rule = {
   total_projects: { type: 'int', required: false },
   total_fans: { type: 'int', required: false },
   total_follows: { type: 'int', required: false },
+  desc: { type: 'string', required: false, allowEmpty: true },
   updated_time: 'string',
 };
 
@@ -20,6 +21,7 @@ const upsert_rule = {
   total_projects: { type: 'int', required: false },
   total_fans: { type: 'int', required: false },
   total_follows: { type: 'int', required: false },
+  desc: { type: 'string', required: false, allowEmpty: true },
   created_time: 'string',
   updated_time: { type: 'string', required: false },
 };
@@ -39,10 +41,12 @@ class UserController extends Controller {
   async update() {
     this.ctx.validate(update_rule);
     const {
-      nickname, portrait, total_projects, total_fans, total_follows, updated_time,
+      nickname, portrait, total_projects, total_fans,
+      desc, total_follows, updated_time,
     } = this.ctx.request.body;
     const data = { doc: {
-      nickname, portrait, total_projects, total_fans, total_follows, updated_time,
+      nickname, portrait, total_projects, total_fans,
+      desc, total_follows, updated_time,
     } };
     const payload = { id: this.ctx.params.id, body: data };
     await super.update(payload);
@@ -52,12 +56,12 @@ class UserController extends Controller {
     this.ctx.validate(upsert_rule);
     const {
       username, nickname, portrait, total_projects, total_fans,
-      total_follows, created_time, updated_time,
+      total_follows, desc, created_time, updated_time,
     } = this.ctx.request.body;
     const suggestions = this.get_suggestions();
     const data = {
       username, portrait, total_projects, total_fans,
-      total_follows, suggestions, created_time,
+      total_follows, desc, suggestions, created_time,
     };
     data.updated_time = updated_time || created_time;
     data.nickname = nickname || username;
