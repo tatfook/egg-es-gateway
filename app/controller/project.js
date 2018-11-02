@@ -65,7 +65,7 @@ class ProjectController extends Controller {
       name, cover, username, user_portrait, visibility,
       type, recruiting, created_time, tags, suggestions,
     };
-    data.updated_time = data.updated_time || data.created_time;
+    data.updated_time = created_time;
     const payload = { id, body: data };
     await super.create(payload);
   }
@@ -76,13 +76,13 @@ class ProjectController extends Controller {
       name, cover, user_portrait, visibility,
       type, recruiting, tags, total_like,
       total_view, total_mark, total_comment,
-      recent_like, recent_view,
+      recent_like, recent_view, updated_time,
     } = this.ctx.request.body;
     const data = { doc: {
       name, cover, user_portrait, visibility,
       type, recruiting, tags, total_like,
       total_view, total_mark, total_comment,
-      recent_like, recent_view,
+      recent_like, recent_view, updated_time,
     } };
     if (name) {
       data.doc.suggestions = this.get_suggestions();
@@ -95,9 +95,9 @@ class ProjectController extends Controller {
     this.ctx.validate(upsert_rule);
     const {
       name, cover, username, user_portrait,
-      visibility, type, recruiting, created_time, tags,
-      total_like, total_view, total_mark, total_comment,
-      recent_like, recent_view,
+      visibility, type, recruiting, created_time,
+      updated_time, tags, total_like, total_view,
+      total_mark, total_comment, recent_like, recent_view,
     } = this.ctx.request.body;
     const suggestions = this.get_suggestions();
     const data = {
@@ -106,7 +106,7 @@ class ProjectController extends Controller {
       total_like, total_view, total_mark, total_comment,
       recent_like, recent_view,
     };
-    data.updated_time = data.updated_time || data.created_time;
+    data.updated_time = updated_time || created_time;
     const payload = { id: this.ctx.params.id, body: data };
     await super.upsert(payload);
   }

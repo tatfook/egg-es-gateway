@@ -53,9 +53,9 @@ class PackageController extends Controller {
     const data = {
       title, cover, total_lessons, prize,
       description, age_min, age_max, suggestions,
-      created_time, updated_time,
+      created_time,
     };
-    data.updated_time = data.updated_time || data.created_time;
+    data.updated_time = updated_time || created_time;
     const payload = { id, body: data };
     await super.create(payload);
   }
@@ -65,12 +65,12 @@ class PackageController extends Controller {
     const {
       title, cover, total_lessons, prize,
       description, recent_view, age_min, age_max,
-      created_time, updated_time,
+      updated_time,
     } = this.ctx.request.body;
     const data = { doc: {
       title, cover, total_lessons, prize,
       description, recent_view, age_min, age_max,
-      created_time, updated_time,
+      updated_time,
     } };
     if (title) {
       data.doc.suggestions = this.get_suggestions();
@@ -90,9 +90,9 @@ class PackageController extends Controller {
     const data = {
       title, cover, total_lessons, description, prize,
       age_min, age_max, recent_view, suggestions,
-      created_time, updated_time,
+      created_time,
     };
-    data.updated_time = data.updated_time || data.created_time;
+    data.updated_time = updated_time || created_time;
     const payload = { id: this.ctx.params.id, body: data };
     await super.upsert(payload);
   }

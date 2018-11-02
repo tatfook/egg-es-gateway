@@ -5,43 +5,62 @@ const Controller = require('../core/base_controller');
 const create_rule = {
   id: 'int',
   username: { type: 'string', min: 4, max: 30 },
+  created_time: 'string',
 };
 
 const update_rule = {
-  portrait: { type: 'string', required: false },
   total_projects: { type: 'int', required: false },
   total_fans: { type: 'int', required: false },
+  total_follows: { type: 'int', required: false },
+  updated_time: 'string',
 };
 
 const upsert_rule = {
   username: { type: 'string', min: 4, max: 30 },
   total_projects: { type: 'int', required: false },
   total_fans: { type: 'int', required: false },
+  total_follows: { type: 'int', required: false },
+  created_time: 'string',
+  updated_time: { type: 'string', required: false },
 };
 
 class UserController extends Controller {
   async create() {
     this.ctx.validate(create_rule);
-    const { id, username, portrait } = this.ctx.request.body;
+    const { id, username, nickname, portrait, created_time } = this.ctx.request.body;
     const suggestions = this.get_suggestions();
-    const data = { username, portrait, suggestions };
+    const data = { username, portrait, created_time, suggestions };
+    data.updated_time = created_time;
+    data.nickname = nickname || username;
     const payload = { id, body: data };
     await super.create(payload);
   }
 
   async update() {
     this.ctx.validate(update_rule);
-    const { portrait, total_projects, total_fans } = this.ctx.request.body;
-    const data = { doc: { portrait, total_projects, total_fans } };
+    const {
+      nickname, portrait, total_projects, total_fans, total_follows, updated_time,
+    } = this.ctx.request.body;
+    const data = { doc: {
+      nickname, portrait, total_projects, total_fans, total_follows, updated_time,
+    } };
     const payload = { id: this.ctx.params.id, body: data };
     await super.update(payload);
   }
 
   async upsert() {
     this.ctx.validate(upsert_rule);
-    const { username, portrait, total_projects, total_fans } = this.ctx.request.body;
+    const {
+      username, nickname, portrait, total_projects, total_fans,
+      total_follows, created_time, updated_time,
+    } = this.ctx.request.body;
     const suggestions = this.get_suggestions();
-    const data = { username, portrait, total_projects, total_fans, suggestions };
+    const data = {
+      username, portrait, total_projects, total_fans,
+      total_follows, suggestions, created_time,
+    };
+    data.updated_time = updated_time || created_time;
+    data.nickname = nickname || username;
     const payload = { id: this.ctx.params.id, body: data };
     await super.upsert(payload);
   }
@@ -59,14 +78,17 @@ class UserController extends Controller {
   }
 
   get_search_DSL() {
-    const DSL = { query: {} };
-    if (this.ctx.query.q) {
-      DSL.query.fuzzy = {
-        username: {
-          value: this.ctx.query.q,
-          fuzziness: 'AUTO',
+    const DSL = {
+      query: {
+        bool: {
+          should: [],
+          must: [],
         },
-      };
+      },
+    };
+    if (this.ctx.query.q) {
+      DSL.query.bool.should.push({ match: { username: this.ctx.query.q } });
+      DSL.query.bool.should.push({ match: { nickname: this.ctx.query.q } });
     }
     return this.sort(DSL);
   }

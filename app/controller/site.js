@@ -9,6 +9,7 @@ const create_rule = {
   cover: { type: 'string', required: false, allowEmpty: true },
   display_name: { type: 'string', required: false, allowEmpty: true },
   desc: { type: 'string', required: false, allowEmpty: true },
+  created_time: 'string',
 };
 
 const update_rule = {
@@ -16,6 +17,7 @@ const update_rule = {
   cover: { type: 'string', required: false, allowEmpty: true },
   display_name: { type: 'string', required: false, allowEmpty: true },
   desc: { type: 'string', required: false, allowEmpty: true },
+  updated_time: 'string',
 };
 
 const upsert_rule = {
@@ -24,6 +26,8 @@ const upsert_rule = {
   cover: { type: 'string', required: false, allowEmpty: true },
   display_name: { type: 'string', required: false, allowEmpty: true },
   desc: { type: 'string', required: false, allowEmpty: true },
+  created_time: 'string',
+  updated_time: { type: 'string', required: false },
 };
 
 class SiteController extends Controller {
@@ -33,14 +37,15 @@ class SiteController extends Controller {
       this.ctx.request.body.display_name = this.ctx.request.body.sitename;
     }
     const {
-      id, username, sitename,
-      cover, display_name, desc,
+      id, username, sitename, cover,
+      display_name, desc, created_time,
     } = this.ctx.request.body;
     const suggestions = this.get_suggestions();
     const data = {
-      username, sitename, cover,
-      display_name, desc, suggestions,
+      username, sitename, cover, display_name,
+      desc, suggestions, created_time,
     };
+    data.updated_time = created_time;
     const payload = { id, body: data };
     await super.create(payload);
   }
@@ -66,12 +71,13 @@ class SiteController extends Controller {
       this.ctx.request.body.display_name = this.ctx.request.body.sitename;
     }
     const {
-      username, sitename, cover, display_name, desc,
+      username, sitename, cover, display_name, desc, created_time, updated_time,
     } = this.ctx.request.body;
     const suggestions = this.get_suggestions();
     const data = {
-      username, sitename, cover, display_name, desc, suggestions,
+      username, sitename, cover, display_name, desc, suggestions, created_time,
     };
+    data.updated_time = updated_time || created_time;
     const payload = { id: this.ctx.params.id, body: data };
     await super.upsert(payload);
   }
