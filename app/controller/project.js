@@ -60,14 +60,14 @@ class ProjectController extends Controller {
       id, name, cover, username, user_portrait,
       visibility, type, recruiting, created_time, tags,
     } = this.ctx.request.body;
-    const suggestions = this.get_suggestions();
     const data = {
       name, cover, username, user_portrait, visibility,
-      type, recruiting, created_time, tags, suggestions,
+      type, recruiting, created_time, tags,
     };
     data.updated_time = created_time;
     const payload = { id, body: data };
     await super.create(payload);
+    this.save_suggestions(name);
   }
 
   async update() {
@@ -84,11 +84,9 @@ class ProjectController extends Controller {
       total_view, total_mark, total_comment,
       recent_like, recent_view, updated_time,
     } };
-    if (name) {
-      data.doc.suggestions = this.get_suggestions();
-    }
     const payload = { id: this.ctx.params.id, body: data };
     await super.update(payload);
+    if (name) { this.save_suggestions(name); }
   }
 
   async upsert() {
@@ -99,23 +97,16 @@ class ProjectController extends Controller {
       updated_time, tags, total_like, total_view,
       total_mark, total_comment, recent_like, recent_view,
     } = this.ctx.request.body;
-    const suggestions = this.get_suggestions();
     const data = {
       name, cover, username, user_portrait, visibility,
-      type, recruiting, created_time, tags, suggestions,
-      total_like, total_view, total_mark, total_comment,
-      recent_like, recent_view,
+      type, recruiting, created_time, tags, total_like,
+      total_view, total_mark, total_comment, recent_like,
+      recent_view,
     };
     data.updated_time = updated_time || created_time;
     const payload = { id: this.ctx.params.id, body: data };
     await super.upsert(payload);
-  }
-
-  get_suggestions() {
-    const { name } = this.ctx.request.body;
-    const pinyin = this.ctx.helper.hanzi_to_pinyin(name);
-    const suggestions = [ name, pinyin ];
-    return suggestions;
+    this.save_suggestions(name);
   }
 
   add_location(payload) {

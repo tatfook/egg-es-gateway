@@ -2,11 +2,15 @@
 
 const Controller = require('egg').Controller;
 
+const suggestions_rule = {
+  prefix: 'string',
+};
+
 class Base_controllerController extends Controller {
-  add_location(payload, data_type) {
+  add_location(payload, data_type, index_only) {
     const { index, type } = this.config.elasticsearch.locations[data_type];
     payload.index = index;
-    payload.type = type;
+    if (!index_only) { payload.type = type; }
     return payload;
   }
 
@@ -29,6 +33,56 @@ class Base_controllerController extends Controller {
         this.ctx.throw(err.statusCode);
       });
     this.ctx.body = this.wrap_search_result(result);
+  }
+
+  async suggest() {
+    this.ctx.validate(suggestions_rule, this.ctx.query);
+    const query = {
+      body: {
+        suggestions: {
+          prefix: this.ctx.query.prefix,
+          completion: {
+            field: 'suggestions',
+            size: Number(this.ctx.query.size) || 5,
+          },
+        },
+      },
+      index: 'suggestions',
+    };
+    const result = await this.service.es.client.suggest(query)
+      .catch(err => {
+        this.ctx.logger.error(err);
+        this.ctx.throw(err.statusCode);
+      });
+    this.ctx.body = this.wrap_suggestions(result);
+  }
+
+  async save_suggestions(...keywords) {
+    const tasks = [];
+    const already_exist = {};
+    for (const keyword of keywords) {
+      if (!keyword || already_exist[keyword]) { continue; }
+      already_exist[keyword] = true;
+      const pinyin = this.ctx.helper.hanzi_to_pinyin(keyword);
+      tasks.push(this.service.es.client.create({
+        index: 'suggestions',
+        type: 'suggestions',
+        id: this.ctx.helper.to_sha1(keyword),
+        body: {
+          keyword,
+          pinyin,
+          suggestions: [ keyword, pinyin ],
+        },
+      }));
+    }
+    await Promise.all(tasks).catch();
+  }
+
+  wrap_suggestions(result) {
+    return result.suggestions[0].options.map(suggestion => {
+      suggestion._source.hit = suggestion.text;
+      return suggestion._source;
+    });
   }
 
   async show() {
@@ -86,23 +140,6 @@ class Base_controllerController extends Controller {
       });
     this.deleted();
   }
-
-  // async count_key_word() {
-  //   const data = {
-  //     script: 'ctx._source.recent_search += 1',
-  //     upsert: {
-  //       recent_search: 1,
-  //       keyword: this.ctx.query.q,
-  //     },
-  //   };
-  //   const payload = { id: this.ctx.query.q, body: data };
-  //   const payload_with_location = this.add_location(payload);
-  //   await this.service.es.client.update(payload_with_location)
-  //     .catch(err => {
-  //       this.ctx.logger.error(err);
-  //       this.ctx.throw(err.statusCode);
-  //     });
-  // }
 
   highlight(DSL, ... fields) {
     const tag = this.config.highlight_tag;

@@ -49,15 +49,14 @@ class PackageController extends Controller {
       prize, description, age_min, age_max,
       created_time, updated_time,
     } = this.ctx.request.body;
-    const suggestions = this.get_suggestions();
     const data = {
       title, cover, total_lessons, prize,
-      description, age_min, age_max, suggestions,
-      created_time,
+      description, age_min, age_max, created_time,
     };
     data.updated_time = updated_time || created_time;
     const payload = { id, body: data };
     await super.create(payload);
+    this.save_suggestions(title);
   }
 
   async update() {
@@ -72,11 +71,9 @@ class PackageController extends Controller {
       description, recent_view, age_min, age_max,
       updated_time,
     } };
-    if (title) {
-      data.doc.suggestions = this.get_suggestions();
-    }
     const payload = { id: this.ctx.params.id, body: data };
     await super.update(payload);
+    if (title) { this.save_suggestions(title); }
   }
 
   async upsert() {
@@ -86,22 +83,14 @@ class PackageController extends Controller {
       description, age_min, age_max,
       recent_view, created_time, updated_time,
     } = this.ctx.request.body;
-    const suggestions = this.get_suggestions();
     const data = {
       title, cover, total_lessons, description, prize,
-      age_min, age_max, recent_view, suggestions,
-      created_time,
+      age_min, age_max, recent_view, created_time,
     };
     data.updated_time = updated_time || created_time;
     const payload = { id: this.ctx.params.id, body: data };
     await super.upsert(payload);
-  }
-
-  get_suggestions() {
-    const { title } = this.ctx.request.body;
-    const pinyin = this.ctx.helper.hanzi_to_pinyin(title);
-    const suggestions = [ title, pinyin ];
-    return suggestions;
+    this.save_suggestions(title);
   }
 
   add_location(payload) {

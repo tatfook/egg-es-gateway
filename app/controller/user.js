@@ -30,12 +30,12 @@ class UserController extends Controller {
   async create() {
     this.ctx.validate(create_rule);
     const { id, username, nickname, portrait, created_time } = this.ctx.request.body;
-    const suggestions = this.get_suggestions();
-    const data = { username, portrait, created_time, suggestions };
+    const data = { username, portrait, created_time };
     data.updated_time = created_time;
     data.nickname = nickname || username;
     const payload = { id, body: data };
     await super.create(payload);
+    this.save_suggestions(username, nickname);
   }
 
   async update() {
@@ -50,6 +50,7 @@ class UserController extends Controller {
     } };
     const payload = { id: this.ctx.params.id, body: data };
     await super.update(payload);
+    if (nickname) { this.save_suggestions(nickname); }
   }
 
   async upsert() {
@@ -58,22 +59,15 @@ class UserController extends Controller {
       username, nickname, portrait, total_projects, total_fans,
       total_follows, desc, created_time, updated_time,
     } = this.ctx.request.body;
-    const suggestions = this.get_suggestions();
     const data = {
       username, portrait, total_projects, total_fans,
-      total_follows, desc, suggestions, created_time,
+      total_follows, desc, created_time,
     };
     data.updated_time = updated_time || created_time;
     data.nickname = nickname || username;
     const payload = { id: this.ctx.params.id, body: data };
     await super.upsert(payload);
-  }
-
-  get_suggestions() {
-    const { username } = this.ctx.request.body;
-    const pinyin = this.ctx.helper.hanzi_to_pinyin(username);
-    const suggestions = [ username, pinyin ];
-    return suggestions;
+    this.save_suggestions(username, nickname);
   }
 
   add_location(payload) {

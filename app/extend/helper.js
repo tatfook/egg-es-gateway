@@ -1,6 +1,7 @@
 'use strict';
 
 const pinyin = require('pinyin');
+const crypto = require('crypto');
 
 module.exports = {
   hanzi_to_pinyin(han) {
@@ -11,5 +12,10 @@ module.exports = {
     const page = Number(query.page) || 1;
     const from = (page - 1) * size;
     return [ from, size ];
+  },
+  to_sha1(str) {
+    const hasher = crypto.createHash('sha1');
+    hasher.update(str);
+    return hasher.digest('hex');
   },
 };

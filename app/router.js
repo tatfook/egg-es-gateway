@@ -25,4 +25,5 @@ module.exports = app => {
   router.resources('/sites', controller.site);
   router.post('/sites/:id/upsert', controller.site.upsert);
 
+  router.get('/suggestions', controller.project.suggest);
 };

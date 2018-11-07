@@ -40,29 +40,23 @@ class SiteController extends Controller {
       id, username, sitename, cover,
       display_name, desc, created_time,
     } = this.ctx.request.body;
-    const suggestions = this.get_suggestions();
     const data = {
       username, sitename, cover, display_name,
-      desc, suggestions, created_time,
+      desc, created_time,
     };
     data.updated_time = created_time;
     const payload = { id, body: data };
     await super.create(payload);
+    this.save_suggestions(sitename, display_name);
   }
 
   async update() {
     this.ctx.validate(update_rule);
-    const { sitename, cover, display_name, desc } = this.ctx.request.body;
+    const { cover, display_name, desc } = this.ctx.request.body;
     const data = { doc: { cover, display_name, desc } };
-    if (display_name) {
-      if (!sitename) {
-        const errMsg = 'sitename is required while updating display_name';
-        this.ctx.throw(400, errMsg);
-      }
-      data.doc.suggestions = this.get_suggestions();
-    }
     const payload = { id: this.ctx.params.id, body: data };
     await super.update(payload);
+    if (display_name) { this.save_suggestions(display_name); }
   }
 
   async upsert() {
@@ -73,25 +67,13 @@ class SiteController extends Controller {
     const {
       username, sitename, cover, display_name, desc, created_time, updated_time,
     } = this.ctx.request.body;
-    const suggestions = this.get_suggestions();
     const data = {
-      username, sitename, cover, display_name, desc, suggestions, created_time,
+      username, sitename, cover, display_name, desc, created_time,
     };
     data.updated_time = updated_time || created_time;
     const payload = { id: this.ctx.params.id, body: data };
     await super.upsert(payload);
-  }
-
-  get_suggestions() {
-    const { sitename, display_name } = this.ctx.request.body;
-    const sitename_pinyin = this.ctx.helper.hanzi_to_pinyin(sitename);
-    const suggestions = [ sitename, sitename_pinyin ];
-    if (display_name !== sitename) {
-      const display_name_pinyin = this.ctx.helper.hanzi_to_pinyin(display_name);
-      suggestions.push(display_name);
-      suggestions.push(display_name_pinyin);
-    }
-    return suggestions;
+    this.save_suggestions(sitename, display_name);
   }
 
   add_location(payload) {
