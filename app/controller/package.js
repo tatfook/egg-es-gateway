@@ -101,7 +101,10 @@ class PackageController extends Controller {
   get_search_DSL() {
     const DSL = { query: {} };
     if (this.ctx.query.q) {
-      DSL.query.match = { title: this.ctx.query.q };
+      DSL.query.multi_match = {
+        query: this.ctx.query.q,
+        fields: [ 'title', 'description' ],
+      };
     }
     this.highlight(DSL, 'title');
     this.sort(DSL);

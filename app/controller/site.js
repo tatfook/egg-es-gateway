@@ -8,7 +8,7 @@ const create_rule = {
   sitename: 'string',
   cover: { type: 'string', required: false, allowEmpty: true },
   display_name: { type: 'string', required: false, allowEmpty: true },
-  desc: { type: 'string', required: false, allowEmpty: true },
+  description: { type: 'string', required: false, allowEmpty: true },
   created_time: 'string',
 };
 
@@ -16,7 +16,7 @@ const update_rule = {
   sitename: { type: 'string', required: false },
   cover: { type: 'string', required: false, allowEmpty: true },
   display_name: { type: 'string', required: false, allowEmpty: true },
-  desc: { type: 'string', required: false, allowEmpty: true },
+  description: { type: 'string', required: false, allowEmpty: true },
   updated_time: 'string',
 };
 
@@ -25,7 +25,7 @@ const upsert_rule = {
   sitename: 'string',
   cover: { type: 'string', required: false, allowEmpty: true },
   display_name: { type: 'string', required: false, allowEmpty: true },
-  desc: { type: 'string', required: false, allowEmpty: true },
+  description: { type: 'string', required: false, allowEmpty: true },
   created_time: 'string',
   updated_time: { type: 'string', required: false },
 };
@@ -38,11 +38,11 @@ class SiteController extends Controller {
     }
     const {
       id, username, sitename, cover,
-      display_name, desc, created_time,
+      display_name, description, created_time,
     } = this.ctx.request.body;
     const data = {
       username, sitename, cover, display_name,
-      desc, created_time,
+      description, created_time,
     };
     data.updated_time = created_time;
     const payload = { id, body: data };
@@ -52,8 +52,8 @@ class SiteController extends Controller {
 
   async update() {
     this.ctx.validate(update_rule);
-    const { cover, display_name, desc } = this.ctx.request.body;
-    const data = { doc: { cover, display_name, desc } };
+    const { cover, display_name, description } = this.ctx.request.body;
+    const data = { doc: { cover, display_name, description } };
     const payload = { id: this.ctx.params.id, body: data };
     await super.update(payload);
     if (display_name) { this.save_suggestions(display_name); }
@@ -65,10 +65,10 @@ class SiteController extends Controller {
       this.ctx.request.body.display_name = this.ctx.request.body.sitename;
     }
     const {
-      username, sitename, cover, display_name, desc, created_time, updated_time,
+      username, sitename, cover, display_name, description, created_time, updated_time,
     } = this.ctx.request.body;
     const data = {
-      username, sitename, cover, display_name, desc, created_time,
+      username, sitename, cover, display_name, description, created_time,
     };
     data.updated_time = updated_time || created_time;
     const payload = { id: this.ctx.params.id, body: data };
