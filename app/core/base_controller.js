@@ -73,9 +73,13 @@ class Base_controllerController extends Controller {
           pinyin,
           suggestions: [ keyword, pinyin ],
         },
+      }).catch(err => {
+        if (err.statusCode !== 409) {
+          this.ctx.logger.error(err);
+        }
       }));
     }
-    await Promise.all(tasks).catch();
+    await Promise.all(tasks);
   }
 
   wrap_suggestions(result) {
