@@ -79,7 +79,7 @@ class Base_controllerController extends Controller {
         }
       }));
     }
-    await Promise.all(tasks);
+    await Promise.all(tasks).catch();
   }
 
   wrap_suggestions(result) {
