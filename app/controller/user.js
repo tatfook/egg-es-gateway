@@ -80,15 +80,19 @@ class UserController extends Controller {
       query: {
         bool: {
           should: [],
-          must: [],
         },
       },
     };
     if (this.ctx.query.q) {
-      DSL.query.bool.should.push({ match: { username: this.ctx.query.q } });
-      DSL.query.bool.should.push({ match: { nickname: this.ctx.query.q } });
+      const max_expansions = this.max_expansions;
+      DSL.query.bool.should.push(
+        { term: { username: { value: this.ctx.query.q, boost: 2 } } },
+        { multi_match: { fields: [ 'username', 'nickname' ], query: this.ctx.query.q, type: 'phrase_prefix', max_expansions } },
+        { wildcard: { username: `*${this.ctx.query.q}*` } },
+        { wildcard: { nickname: `*${this.ctx.query.q}*` } }
+      );
     }
-    return this.sort(DSL);
+    return this.sort_many(DSL, [ '_score', 'updated_time' ]);
   }
 
   wrap_search_result(result) {

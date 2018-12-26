@@ -99,16 +99,22 @@ class PackageController extends Controller {
   }
 
   get_search_DSL() {
-    const DSL = { query: {} };
+    const DSL = {
+      query: {
+        bool: {
+        },
+      },
+    };
     if (this.ctx.query.q) {
-      DSL.query.multi_match = {
-        query: this.ctx.query.q,
-        fields: [ 'title', 'description' ],
-      };
+      const max_expansions = this.max_expansions;
+      DSL.query.bool.should = [
+        { term: { title: { value: this.ctx.query.q, boost: 2 } } },
+        { multi_match: { fields: [ 'title', 'description' ], query: this.ctx.query.q, type: 'phrase_prefix', max_expansions } },
+        { wildcard: { title: `*${this.ctx.query.q}*` } },
+      ];
     }
-    this.highlight(DSL, 'title');
-    this.sort(DSL);
-    return DSL;
+    this.highlight(DSL, 'title', 'description');
+    return this.sort_many(DSL, [ '_score', 'updated_time' ]);
   }
 
   wrap_search_result(result) {

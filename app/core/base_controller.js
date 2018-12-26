@@ -160,11 +160,53 @@ class Base_controllerController extends Controller {
     return DSL;
   }
 
+  get max_expansions() {
+    const query_length = this.ctx.query.q;
+    let max_expansions;
+    switch (true) {
+      case query_length > 36:
+        max_expansions = 10;
+        break;
+      case query_length > 12:
+        max_expansions = Math.floor(query_length / 4) + 1;
+        break;
+      case query_length > 3:
+        max_expansions = Math.floor(query_length / 3);
+        break;
+      default:
+        max_expansions = 1;
+        break;
+    }
+    return max_expansions;
+  }
+
   sort(DSL = {}, field = this.ctx.query.sort, order = this.ctx.query.order) {
     if (field) {
-      DSL.sort = [{
+      DSL.sort = DSL.sort || [];
+      DSL.sort.push({
         [field]: { order: order || 'desc' },
-      }];
+      });
+    }
+    return DSL;
+  }
+
+  sort_many(DSL = {}, fields) {
+    if (!DSL.sort) {
+      DSL = this.sort(
+        DSL,
+        this.ctx.query.sort,
+        this.ctx.query.order
+      );
+    }
+    for (const field of fields) {
+      if (Object(field) instanceof String) {
+        DSL = this.sort(DSL, field);
+      } else if (field instanceof Object) {
+        for (const name in field) {
+          const order = field[name];
+          DSL = this.sort(DSL, field, order);
+        }
+      }
     }
     return DSL;
   }
