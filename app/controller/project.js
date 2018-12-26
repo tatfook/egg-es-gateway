@@ -143,8 +143,11 @@ class ProjectController extends Controller {
       DSL.query.bool.must.push({
         bool: {
           should: [
-            { term: { name: { value: this.ctx.query.q, boost: 3 } } },
-            { match_phrase_prefix: { name: { query: this.ctx.query.q, max_expansions, boost: 2 } } },
+            { term: { 'name.keyword': { value: this.ctx.query.q, boost: 3 } } },
+            { prefix: { username: { value: this.ctx.query.q, boost: 2 } } },
+            { match_phrase_prefix: {
+              name: { query: this.ctx.query.q, max_expansions, boost: 2 },
+            } },
             { wildcard: { name: `*${this.ctx.query.q}*` } },
           ],
         },

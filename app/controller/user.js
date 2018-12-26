@@ -78,19 +78,21 @@ class UserController extends Controller {
   get_search_DSL() {
     const DSL = {
       query: {
-        bool: {
-          should: [],
-        },
+        bool: {},
       },
     };
     if (this.ctx.query.q) {
       const max_expansions = this.max_expansions;
-      DSL.query.bool.should.push(
-        { term: { username: { value: this.ctx.query.q, boost: 2 } } },
-        { multi_match: { fields: [ 'username', 'nickname' ], query: this.ctx.query.q, type: 'phrase_prefix', max_expansions } },
+      DSL.query.bool.should = [
+        { term: { 'username.keyword': { value: this.ctx.query.q, boost: 3 } } },
+        { prefix: { username: { value: this.ctx.query.q, boost: 2 } } },
+        { multi_match: {
+          fields: [ 'username', 'nickname' ], query: this.ctx.query.q,
+          type: 'phrase_prefix', max_expansions,
+        } },
         { wildcard: { username: `*${this.ctx.query.q}*` } },
-        { wildcard: { nickname: `*${this.ctx.query.q}*` } }
-      );
+        { wildcard: { nickname: `*${this.ctx.query.q}*` } },
+      ];
     }
     return this.sort_many(DSL, [ '_score', 'updated_time' ]);
   }

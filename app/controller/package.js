@@ -108,8 +108,12 @@ class PackageController extends Controller {
     if (this.ctx.query.q) {
       const max_expansions = this.max_expansions;
       DSL.query.bool.should = [
-        { term: { title: { value: this.ctx.query.q, boost: 2 } } },
-        { multi_match: { fields: [ 'title', 'description' ], query: this.ctx.query.q, type: 'phrase_prefix', max_expansions } },
+        { term: { 'title.keyword': { value: this.ctx.query.q, boost: 3 } } },
+        { prefix: { username: { value: this.ctx.query.q, boost: 2 } } },
+        { multi_match: {
+          fields: [ 'title', 'description' ], query: this.ctx.query.q,
+          type: 'phrase_prefix', max_expansions,
+        } },
         { wildcard: { title: `*${this.ctx.query.q}*` } },
       ];
     }
