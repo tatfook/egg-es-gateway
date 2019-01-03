@@ -7,16 +7,16 @@ let Client;
 
 class EsService extends Service {
   get client() {
-    if (!Client) {
-      const config = this.config.elasticsearch;
-      Client = new elasticsearch.Client({
-        host: config.url,
-        apiVersion: config.version,
-        log: 'info',
-      });
-    }
     return Client;
   }
 }
 
-module.exports = EsService;
+module.exports = app => {
+  const config = app.config.elasticsearch;
+  Client = new elasticsearch.Client({
+    host: config.url,
+    apiVersion: config.version,
+    log: 'info',
+  });
+  return EsService;
+};
