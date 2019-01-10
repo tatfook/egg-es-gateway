@@ -6,7 +6,7 @@ const suggestions_rule = {
   prefix: 'string',
 };
 
-class Base_controllerController extends Controller {
+class baseController extends Controller {
   add_location(payload, data_type, index_only) {
     const { index, type } = this.config.elasticsearch.locations[data_type];
     payload.index = index;
@@ -90,7 +90,7 @@ class Base_controllerController extends Controller {
   }
 
   async show() {
-    const query = this.ctx.params;
+    const query = { id: this.ctx.params.id };
     const query_with_location = this.add_location(query);
     const res = await this.service.es.client.get(query_with_location)
       .catch(err => {
@@ -211,6 +211,10 @@ class Base_controllerController extends Controller {
     return DSL;
   }
 
+  get invisible_DSL() {
+    return { term: { visibility: 'private' } };
+  }
+
   get_rank_DSL(field, order) {
     const DSL = this.sort({}, field, order);
     return DSL;
@@ -244,4 +248,4 @@ class Base_controllerController extends Controller {
   }
 }
 
-module.exports = Base_controllerController;
+module.exports = baseController;

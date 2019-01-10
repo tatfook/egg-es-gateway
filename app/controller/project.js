@@ -1,6 +1,6 @@
 'use strict';
 
-const Controller = require('../core/base_controller');
+const Controller = require('../core/base');
 
 const create_rule = {
   id: 'int',
@@ -92,7 +92,7 @@ class ProjectController extends Controller {
     } };
     const payload = { id: this.ctx.params.id, body: data };
     await super.update(payload);
-    if (name) { this.save_suggestions(name); }
+    if (name) this.save_suggestions(name);
   }
 
   async upsert() {
@@ -125,7 +125,7 @@ class ProjectController extends Controller {
   get_rank_DSL(field, order) {
     const DSL = this.sort({}, field, order);
     DSL.query = {
-      bool: { must_not: { term: { visibility: 'private' } } },
+      bool: { must_not: this.invisible_DSL },
     };
     return DSL;
   }
@@ -135,7 +135,7 @@ class ProjectController extends Controller {
       query: {
         bool: {
           must: [],
-          must_not: { term: { visibility: 'private' } },
+          must_not: this.invisible_DSL,
         },
       },
     };
