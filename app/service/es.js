@@ -16,7 +16,7 @@ module.exports = app => {
   Client = new elasticsearch.Client({
     host: config.url,
     apiVersion: config.version,
-    log: 'info',
+    log: config.log || 'info',
   });
   return EsService;
 };
