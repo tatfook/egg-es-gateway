@@ -128,7 +128,11 @@ class baseController extends Controller {
   async bulk() {
     const { ctx } = this;
     ctx.ensureAdmin();
-    const params = ctx.params.permit('index', 'type', 'body');
+    const params = {
+      body: this.ctx.params.body,
+      type: this.ctx.params.type,
+      index: this.ctx.params.index,
+    };
     const response = await this.service.es.client.bulk(params)
       .catch(err => this.error(err));
     ctx.body = response;
