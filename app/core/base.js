@@ -90,6 +90,7 @@ class baseController extends Controller {
   }
 
   async show() {
+    this.ctx.ensureAdmin();
     const query = { id: this.ctx.params.id };
     const query_with_location = this.add_location(query);
     const res = await this.service.es.client.get(query_with_location)
@@ -135,7 +136,7 @@ class baseController extends Controller {
 
   async destroy() {
     this.ctx.ensureAdmin();
-    const query = this.ctx.params;
+    const query = { id: this.ctx.params.id };
     const query_with_location = this.add_location(query);
     await this.service.es.client.delete(query_with_location)
       .catch(err => {
