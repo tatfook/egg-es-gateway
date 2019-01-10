@@ -18,11 +18,6 @@ class baseController extends Controller {
     await this.search();
   }
 
-  async rank(field, order = 'desc') {
-    const DSL = this.get_rank_DSL(field, order);
-    await this.search(DSL);
-  }
-
   async search(DSL = this.get_search_DSL()) {
     const [ from, size ] = this.ctx.helper.paginate(this.ctx.query);
     const query = { from, size, body: DSL };
@@ -30,57 +25,6 @@ class baseController extends Controller {
     const result = await this.service.es.client.search(query_with_location)
       .catch(err => this.error(err));
     this.ctx.body = this.wrap_search_result(result);
-  }
-
-  async suggest() {
-    this.ctx.validate(suggestions_rule, this.ctx.query);
-    const query = {
-      body: {
-        suggestions: {
-          prefix: this.ctx.query.prefix,
-          completion: {
-            field: 'suggestions',
-            size: Number(this.ctx.query.size) || 5,
-          },
-        },
-      },
-      index: 'suggestions',
-    };
-    const result = await this.service.es.client.suggest(query)
-      .catch(err => this.error(err));
-    this.ctx.body = this.wrap_suggestions(result);
-  }
-
-  async save_suggestions(...keywords) {
-    const tasks = [];
-    const already_exist = {};
-    for (const keyword of keywords) {
-      if (!keyword || already_exist[keyword]) { continue; }
-      already_exist[keyword] = true;
-      const pinyin = this.ctx.helper.hanzi_to_pinyin(keyword);
-      tasks.push(this.service.es.client.create({
-        index: 'suggestions',
-        type: 'suggestions',
-        id: this.ctx.helper.to_sha1(keyword),
-        body: {
-          keyword,
-          pinyin,
-          suggestions: [ keyword, pinyin ],
-        },
-      }).catch(err => {
-        if (err.statusCode !== 409) {
-          this.ctx.logger.error(err);
-        }
-      }));
-    }
-    await Promise.all(tasks).catch();
-  }
-
-  wrap_suggestions(result) {
-    return result.suggestions[0].options.map(suggestion => {
-      suggestion._source.hit = suggestion.text;
-      return suggestion._source;
-    });
   }
 
   async show() {
@@ -173,6 +117,7 @@ class baseController extends Controller {
     return max_expansions;
   }
 
+  // method to add sorting condition into search DSL
   sort(DSL = {}, field = this.ctx.query.sort, order = this.ctx.query.order) {
     if (field) {
       DSL.sort = DSL.sort || [];
@@ -208,9 +153,67 @@ class baseController extends Controller {
     return { term: { visibility: 'private' } };
   }
 
+  // api for ranking such as hot, latest, etc
+  async rank(field, order = 'desc') {
+    const DSL = this.get_rank_DSL(field, order);
+    await this.search(DSL);
+  }
+
   get_rank_DSL(field, order) {
     const DSL = this.sort({}, field, order);
     return DSL;
+  }
+
+  // api for query words suggestion
+  async suggest() {
+    this.ctx.validate(suggestions_rule, this.ctx.query);
+    const query = {
+      body: {
+        suggestions: {
+          prefix: this.ctx.query.prefix,
+          completion: {
+            field: 'suggestions',
+            size: Number(this.ctx.query.size) || 5,
+          },
+        },
+      },
+      index: 'suggestions',
+    };
+    const result = await this.service.es.client.suggest(query)
+      .catch(err => this.error(err));
+    this.ctx.body = this.wrap_suggestions(result);
+  }
+
+  async save_suggestions(...keywords) {
+    const tasks = [];
+    const already_exist = {};
+    for (const keyword of keywords) {
+      if (!keyword || already_exist[keyword]) { continue; }
+      already_exist[keyword] = true;
+      const pinyin = this.ctx.helper.hanzi_to_pinyin(keyword);
+      tasks.push(this.service.es.client.create({
+        index: 'suggestions',
+        type: 'suggestions',
+        id: this.ctx.helper.to_sha1(keyword),
+        body: {
+          keyword,
+          pinyin,
+          suggestions: [ keyword, pinyin ],
+        },
+      }).catch(err => {
+        if (err.statusCode !== 409) {
+          this.ctx.logger.error(err);
+        }
+      }));
+    }
+    await Promise.all(tasks).catch();
+  }
+
+  wrap_suggestions(result) {
+    return result.suggestions[0].options.map(suggestion => {
+      suggestion._source.hit = suggestion.text;
+      return suggestion._source;
+    });
   }
 
   success(action = 'success') {
