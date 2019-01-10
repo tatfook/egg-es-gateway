@@ -10,6 +10,8 @@ module.exports = app => {
 
   router.get('/', controller.home.index);
 
+  router.post('/bulk', controller.base.bulk);
+
   router.resources('/users', controller.user);
   router.post('/users/:id/upsert', controller.user.upsert);
 
@@ -24,6 +26,8 @@ module.exports = app => {
 
   router.resources('/sites', controller.site);
   router.post('/sites/:id/upsert', controller.site.upsert);
+
+  router.resources('/pages', controller.page);
 
   router.get('/suggestions', controller.project.suggest);
 };
