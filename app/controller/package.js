@@ -117,8 +117,8 @@ class PackageController extends Controller {
         { wildcard: { title: `*${this.ctx.query.q}*` } },
       ];
     }
-    this.highlight(DSL, 'title', 'description');
-    return this.sort_many(DSL, [ '_score', 'updated_time' ]);
+    this.add_highlight_DSL(DSL, 'title', 'description');
+    return this.add_multi_sort_DSL(DSL, [ '_score', 'updated_time' ]);
   }
 
   wrap_search_result(result) {

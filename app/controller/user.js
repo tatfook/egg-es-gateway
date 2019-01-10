@@ -94,7 +94,7 @@ class UserController extends Controller {
         { wildcard: { nickname: `*${this.ctx.query.q}*` } },
       ];
     }
-    return this.sort_many(DSL, [ '_score', 'updated_time' ]);
+    return this.add_multi_sort_DSL(DSL, [ '_score', 'updated_time' ]);
   }
 
   wrap_search_result(result) {

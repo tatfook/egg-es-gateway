@@ -82,7 +82,7 @@ class baseController extends Controller {
     ctx.body = response;
   }
 
-  highlight(DSL, ... fields) {
+  add_highlight_DSL(DSL, ... fields) {
     const tag = this.config.highlight_tag;
     if (fields.length > 0) {
       DSL.highlight = {
@@ -118,7 +118,7 @@ class baseController extends Controller {
   }
 
   // method to add sorting condition into search DSL
-  sort(DSL = {}, field = this.ctx.query.sort, order = this.ctx.query.order) {
+  add_sort_DSL(DSL = {}, field = this.ctx.query.sort, order = this.ctx.query.order) {
     if (field) {
       DSL.sort = DSL.sort || [];
       DSL.sort.push({
@@ -128,9 +128,9 @@ class baseController extends Controller {
     return DSL;
   }
 
-  sort_many(DSL = {}, fields) {
+  add_multi_sort_DSL(DSL = {}, fields) {
     if (!DSL.sort) {
-      DSL = this.sort(
+      DSL = this.add_sort_DSL(
         DSL,
         this.ctx.query.sort,
         this.ctx.query.order
@@ -138,11 +138,11 @@ class baseController extends Controller {
     }
     for (const field of fields) {
       if (Object(field) instanceof String) {
-        DSL = this.sort(DSL, field);
+        DSL = this.add_sort_DSL(DSL, field);
       } else if (field instanceof Object) {
         for (const name in field) {
           const order = field[name];
-          DSL = this.sort(DSL, field, order);
+          DSL = this.add_sort_DSL(DSL, field, order);
         }
       }
     }
@@ -160,7 +160,7 @@ class baseController extends Controller {
   }
 
   get_rank_DSL(field, order) {
-    const DSL = this.sort({}, field, order);
+    const DSL = this.add_sort_DSL({}, field, order);
     return DSL;
   }
 

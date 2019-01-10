@@ -89,9 +89,9 @@ class SiteController extends Controller {
         fields: [ 'sitename', 'display_name' ],
       };
     }
-    this.highlight(DSL, 'sitename', 'display_name');
-    this.sort(DSL);
-    return this.sort(DSL);
+    this.add_highlight_DSL(DSL, 'sitename', 'display_name');
+    this.add_sort_DSL(DSL);
+    return this.add_sort_DSL(DSL);
   }
 
   wrap_search_result(result) {

@@ -123,7 +123,7 @@ class ProjectController extends Controller {
   }
 
   get_rank_DSL(field, order) {
-    const DSL = this.sort({}, field, order);
+    const DSL = this.add_sort_DSL({}, field, order);
     DSL.query = {
       bool: { must_not: this.invisible_DSL },
     };
@@ -168,8 +168,8 @@ class ProjectController extends Controller {
     if (this.ctx.query.recruiting) {
       DSL.query.bool.must.push({ term: { recruiting: true } });
     }
-    this.highlight(DSL, 'id', 'name', 'username');
-    this.sort_many(DSL, [ '_score', 'updated_time' ]);
+    this.add_highlight_DSL(DSL, 'id', 'name', 'username');
+    this.add_multi_sort_DSL(DSL, [ '_score', 'updated_time' ]);
     return DSL;
   }
 
