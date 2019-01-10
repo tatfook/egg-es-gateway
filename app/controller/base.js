@@ -28,10 +28,7 @@ class baseController extends Controller {
     const query = { from, size, body: DSL };
     const query_with_location = this.add_location(query);
     const result = await this.service.es.client.search(query_with_location)
-      .catch(err => {
-        this.ctx.logger.error(err);
-        this.ctx.throw(err.statusCode);
-      });
+      .catch(err => this.error(err));
     this.ctx.body = this.wrap_search_result(result);
   }
 
@@ -50,10 +47,7 @@ class baseController extends Controller {
       index: 'suggestions',
     };
     const result = await this.service.es.client.suggest(query)
-      .catch(err => {
-        this.ctx.logger.error(err);
-        this.ctx.throw(err.statusCode);
-      });
+      .catch(err => this.error(err));
     this.ctx.body = this.wrap_suggestions(result);
   }
 
@@ -94,10 +88,7 @@ class baseController extends Controller {
     const query = { id: this.ctx.params.id };
     const query_with_location = this.add_location(query);
     const res = await this.service.es.client.get(query_with_location)
-      .catch(err => {
-        this.ctx.logger.error(err);
-        this.ctx.throw(err.statusCode);
-      });
+      .catch(err => this.error(err));
     this.ctx.body = res._source;
   }
 
@@ -105,10 +96,7 @@ class baseController extends Controller {
     this.ctx.ensureAdmin();
     const payload_with_location = this.add_location(payload);
     await this.service.es.client.create(payload_with_location)
-      .catch(err => {
-        this.ctx.logger.error(err);
-        this.ctx.throw(err.statusCode);
-      });
+      .catch(err => this.error(err));
     this.created();
   }
 
@@ -116,10 +104,7 @@ class baseController extends Controller {
     this.ctx.ensureAdmin();
     const payload_with_location = this.add_location(payload);
     await this.service.es.client.update(payload_with_location)
-      .catch(err => {
-        this.ctx.logger.error(err);
-        this.ctx.throw(err.statusCode);
-      });
+      .catch(err => this.error(err));
     this.updated();
   }
 
@@ -127,10 +112,7 @@ class baseController extends Controller {
     this.ctx.ensureAdmin();
     const payload_with_location = this.add_location(payload);
     await this.service.es.client.index(payload_with_location)
-      .catch(err => {
-        this.ctx.logger.error(err);
-        this.ctx.throw(err.statusCode);
-      });
+      .catch(err => this.error(err));
     this.upserted();
   }
 
@@ -139,11 +121,17 @@ class baseController extends Controller {
     const query = { id: this.ctx.params.id };
     const query_with_location = this.add_location(query);
     await this.service.es.client.delete(query_with_location)
-      .catch(err => {
-        this.ctx.logger.error(err);
-        this.ctx.throw(err.statusCode);
-      });
+      .catch(err => this.error(err));
     this.deleted();
+  }
+
+  async bulk() {
+    const { ctx } = this;
+    ctx.ensureAdmin();
+    const params = ctx.params.permit('index', 'type', 'body');
+    const response = await this.service.es.client.bulk(params)
+      .catch(err => this.error(err));
+    ctx.body = response;
   }
 
   highlight(DSL, ... fields) {
@@ -246,6 +234,11 @@ class baseController extends Controller {
 
   moved() {
     this.success('moved');
+  }
+
+  error(err) {
+    this.ctx.logger.error(err);
+    this.ctx.throw(err.statusCode);
   }
 }
 

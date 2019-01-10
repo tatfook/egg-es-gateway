@@ -1,6 +1,6 @@
 'use strict';
 
-const Controller = require('../core/base');
+const Controller = require('./base');
 
 const create_rule = {
   id: 'int',
