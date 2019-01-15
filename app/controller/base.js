@@ -6,6 +6,10 @@ const suggestions_rule = {
   prefix: 'string',
 };
 
+const bulk_rule = {
+  body: 'array',
+};
+
 class baseController extends Controller {
   add_location(payload, data_type, index_only) {
     const { index, type } = this.config.elasticsearch.locations[data_type];
@@ -19,25 +23,28 @@ class baseController extends Controller {
   }
 
   async search(DSL = this.get_search_DSL()) {
-    const [ from, size ] = this.ctx.helper.paginate(this.ctx.query);
+    const { ctx } = this;
+    const [ from, size ] = ctx.helper.paginate(ctx.query);
     const query = { from, size, body: DSL };
     const query_with_location = this.add_location(query);
     const result = await this.service.es.client.search(query_with_location)
       .catch(err => this.error(err));
-    this.ctx.body = this.wrap_search_result(result);
+    ctx.body = this.wrap_search_result(result);
   }
 
   async show() {
-    this.ctx.ensureAdmin();
-    const query = { id: this.ctx.params.id };
+    const { ctx } = this;
+    ctx.ensureAdmin();
+    const query = { id: ctx.params.id };
     const query_with_location = this.add_location(query);
     const res = await this.service.es.client.get(query_with_location)
       .catch(err => this.error(err));
-    this.ctx.body = res._source;
+    ctx.body = res._source;
   }
 
   async create(payload) {
-    this.ctx.ensureAdmin();
+    const { ctx } = this;
+    ctx.ensureAdmin();
     const payload_with_location = this.add_location(payload);
     await this.service.es.client.create(payload_with_location)
       .catch(err => this.error(err));
@@ -45,7 +52,8 @@ class baseController extends Controller {
   }
 
   async update(payload) {
-    this.ctx.ensureAdmin();
+    const { ctx } = this;
+    ctx.ensureAdmin();
     const payload_with_location = this.add_location(payload);
     await this.service.es.client.update(payload_with_location)
       .catch(err => this.error(err));
@@ -53,7 +61,8 @@ class baseController extends Controller {
   }
 
   async upsert(payload) {
-    this.ctx.ensureAdmin();
+    const { ctx } = this;
+    ctx.ensureAdmin();
     const payload_with_location = this.add_location(payload);
     await this.service.es.client.index(payload_with_location)
       .catch(err => this.error(err));
@@ -61,8 +70,9 @@ class baseController extends Controller {
   }
 
   async destroy() {
-    this.ctx.ensureAdmin();
-    const query = { id: this.ctx.params.id };
+    const { ctx } = this;
+    ctx.ensureAdmin();
+    const query = { id: ctx.params.id };
     const query_with_location = this.add_location(query);
     await this.service.es.client.delete(query_with_location)
       .catch(err => this.error(err));
@@ -71,11 +81,12 @@ class baseController extends Controller {
 
   async bulk() {
     const { ctx } = this;
+    ctx.validate(bulk_rule);
     ctx.ensureAdmin();
     const params = {
-      body: this.ctx.params.body,
-      type: this.ctx.params.type,
-      index: this.ctx.params.index,
+      body: ctx.params.body,
+      type: ctx.params.type,
+      index: ctx.params.index,
     };
     const response = await this.service.es.client.bulk(params)
       .catch(err => this.error(err));
@@ -98,7 +109,8 @@ class baseController extends Controller {
   }
 
   get max_expansions() {
-    const query_length = this.ctx.query.q;
+    const { ctx } = this;
+    const query_length = ctx.query.q;
     let max_expansions;
     switch (true) {
       case query_length > 36:
@@ -129,11 +141,12 @@ class baseController extends Controller {
   }
 
   add_multi_sort_DSL(DSL = {}, fields) {
+    const { ctx } = this;
     if (!DSL.sort) {
       DSL = this.add_sort_DSL(
         DSL,
-        this.ctx.query.sort,
-        this.ctx.query.order
+        ctx.query.sort,
+        ctx.query.order
       );
     }
     for (const field of fields) {
@@ -166,14 +179,15 @@ class baseController extends Controller {
 
   // api for query words suggestion
   async suggest() {
-    this.ctx.validate(suggestions_rule, this.ctx.query);
+    const { ctx } = this;
+    ctx.validate(suggestions_rule, ctx.query);
     const query = {
       body: {
         suggestions: {
-          prefix: this.ctx.query.prefix,
+          prefix: ctx.query.prefix,
           completion: {
             field: 'suggestions',
-            size: Number(this.ctx.query.size) || 5,
+            size: Number(ctx.query.size) || 5,
           },
         },
       },
@@ -181,20 +195,21 @@ class baseController extends Controller {
     };
     const result = await this.service.es.client.suggest(query)
       .catch(err => this.error(err));
-    this.ctx.body = this.wrap_suggestions(result);
+    ctx.body = this.wrap_suggestions(result);
   }
 
   async save_suggestions(...keywords) {
+    const { ctx } = this;
     const tasks = [];
     const already_exist = {};
     for (const keyword of keywords) {
       if (!keyword || already_exist[keyword]) { continue; }
       already_exist[keyword] = true;
-      const pinyin = this.ctx.helper.hanzi_to_pinyin(keyword);
+      const pinyin = ctx.helper.hanzi_to_pinyin(keyword);
       tasks.push(this.service.es.client.create({
         index: 'suggestions',
         type: 'suggestions',
-        id: this.ctx.helper.to_sha1(keyword),
+        id: ctx.helper.to_sha1(keyword),
         body: {
           keyword,
           pinyin,
@@ -202,7 +217,7 @@ class baseController extends Controller {
         },
       }).catch(err => {
         if (err.statusCode !== 409) {
-          this.ctx.logger.error(err);
+          ctx.logger.error(err);
         }
       }));
     }
@@ -217,12 +232,14 @@ class baseController extends Controller {
   }
 
   success(action = 'success') {
-    this.ctx.body = {};
-    this.ctx.body[action] = true;
+    const { ctx } = this;
+    ctx.body = {};
+    ctx.body[action] = true;
   }
 
   created() {
-    this.ctx.status = 201;
+    const { ctx } = this;
+    ctx.status = 201;
     this.success('created');
   }
 
@@ -244,8 +261,9 @@ class baseController extends Controller {
   }
 
   error(err) {
-    this.ctx.logger.error(err);
-    this.ctx.throw(err.statusCode);
+    const { ctx } = this;
+    ctx.logger.error(err);
+    ctx.throw(err.statusCode);
   }
 }
 
