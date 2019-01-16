@@ -10,8 +10,8 @@ const create_rule = {
   description: { type: 'string', required: false, allowEmpty: true },
   age_min: { type: 'int', required: false },
   age_max: { type: 'int', required: false },
-  created_time: 'string',
-  updated_time: { type: 'string', required: false },
+  created_at: 'string',
+  updated_at: { type: 'string', required: false },
 };
 
 const update_rule = {
@@ -22,7 +22,7 @@ const update_rule = {
   recent_view: { type: 'int', required: false },
   age_min: { type: 'int', required: false },
   age_max: { type: 'int', required: false },
-  updated_time: 'string',
+  updated_at: 'string',
 };
 
 const upsert_rule = {
@@ -33,8 +33,8 @@ const upsert_rule = {
   age_min: { type: 'int', required: false },
   age_max: { type: 'int', required: false },
   recent_view: { type: 'int', required: false },
-  created_time: 'string',
-  updated_time: { type: 'string', required: false },
+  created_at: 'string',
+  updated_at: { type: 'string', required: false },
 };
 
 class PackageController extends Controller {
@@ -47,13 +47,13 @@ class PackageController extends Controller {
     const {
       id, title, cover, total_lessons,
       prize, description, age_min, age_max,
-      created_time, updated_time,
+      created_at, updated_at,
     } = this.ctx.request.body;
     const data = {
       title, cover, total_lessons, prize,
-      description, age_min, age_max, created_time,
+      description, age_min, age_max, created_at,
     };
-    data.updated_time = updated_time || created_time;
+    data.updated_at = updated_at || created_at;
     const payload = { id, body: data };
     await super.create(payload);
     this.save_suggestions(title);
@@ -64,12 +64,12 @@ class PackageController extends Controller {
     const {
       title, cover, total_lessons, prize,
       description, recent_view, age_min, age_max,
-      updated_time,
+      updated_at,
     } = this.ctx.request.body;
     const data = { doc: {
       title, cover, total_lessons, prize,
       description, recent_view, age_min, age_max,
-      updated_time,
+      updated_at,
     } };
     const payload = { id: this.ctx.params.id, body: data };
     await super.update(payload);
@@ -81,13 +81,13 @@ class PackageController extends Controller {
     const {
       title, cover, total_lessons, prize,
       description, age_min, age_max,
-      recent_view, created_time, updated_time,
+      recent_view, created_at, updated_at,
     } = this.ctx.request.body;
     const data = {
       title, cover, total_lessons, description, prize,
-      age_min, age_max, recent_view, created_time,
+      age_min, age_max, recent_view, created_at,
     };
-    data.updated_time = updated_time || created_time;
+    data.updated_at = updated_at || created_at;
     const payload = { id: this.ctx.params.id, body: data };
     await super.upsert(payload);
     this.save_suggestions(title);
@@ -118,7 +118,7 @@ class PackageController extends Controller {
       ];
     }
     this.add_highlight_DSL(DSL, 'title', 'description');
-    return this.add_multi_sort_DSL(DSL, [ '_score', 'updated_time' ]);
+    return this.add_multi_sort_DSL(DSL, [ '_score', 'updated_at' ]);
   }
 
   wrap_search_result(result) {

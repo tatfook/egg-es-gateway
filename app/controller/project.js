@@ -11,7 +11,7 @@ const create_rule = {
   recruiting: 'bool',
   description: { type: 'string', required: false, allowEmpty: true },
   tags: { type: 'array', itemType: 'string', required: false },
-  created_time: 'string',
+  created_at: 'string',
 };
 
 const update_rule = {
@@ -27,7 +27,7 @@ const update_rule = {
   total_comment: { type: 'int', required: false },
   recent_like: { type: 'int', required: false },
   recent_view: { type: 'int', required: false },
-  updated_time: 'string',
+  updated_at: 'string',
 };
 
 const upsert_rule = {
@@ -44,8 +44,8 @@ const upsert_rule = {
   total_comment: { type: 'int', required: false },
   recent_like: { type: 'int', required: false },
   recent_view: { type: 'int', required: false },
-  created_time: 'string',
-  updated_time: { type: 'string', required: false },
+  created_at: 'string',
+  updated_at: { type: 'string', required: false },
 };
 
 class ProjectController extends Controller {
@@ -61,14 +61,14 @@ class ProjectController extends Controller {
     this.ctx.validate(create_rule);
     const {
       id, name, cover, username, user_portrait, description,
-      visibility, type, recruiting, created_time, tags, video,
+      visibility, type, recruiting, created_at, tags, video,
     } = this.ctx.request.body;
     const data = {
       name, cover, username, user_portrait, description,
-      visibility, type, recruiting, created_time, tags,
+      visibility, type, recruiting, created_at, tags,
       video, id,
     };
-    data.updated_time = created_time;
+    data.updated_at = created_at;
     const payload = { id, body: data };
     await super.create(payload);
     this.save_suggestions(name);
@@ -80,14 +80,14 @@ class ProjectController extends Controller {
       name, cover, user_portrait, visibility,
       type, recruiting, tags, total_like,
       total_view, total_mark, total_comment,
-      recent_like, recent_view, updated_time,
+      recent_like, recent_view, updated_at,
       description, video,
     } = this.ctx.request.body;
     const data = { doc: {
       name, cover, user_portrait, visibility,
       type, recruiting, tags, total_like,
       total_view, total_mark, total_comment,
-      recent_like, recent_view, updated_time,
+      recent_like, recent_view, updated_at,
       description, video,
     } };
     const payload = { id: this.ctx.params.id, body: data };
@@ -100,18 +100,18 @@ class ProjectController extends Controller {
     const id = this.ctx.params.id;
     const {
       name, cover, username, user_portrait, description,
-      visibility, type, recruiting, created_time,
-      updated_time, tags, total_like, total_view,
+      visibility, type, recruiting, created_at,
+      updated_at, tags, total_like, total_view,
       total_mark, total_comment, recent_like, recent_view,
       video,
     } = this.ctx.request.body;
     const data = {
       name, cover, username, user_portrait, description,
-      visibility, type, recruiting, created_time, tags,
+      visibility, type, recruiting, created_at, tags,
       total_like, total_view, total_mark, total_comment,
       recent_like, recent_view, video, id,
     };
-    data.updated_time = updated_time || created_time;
+    data.updated_at = updated_at || created_at;
     const payload = { id, body: data };
     await super.upsert(payload);
     this.save_suggestions(name);
@@ -169,7 +169,7 @@ class ProjectController extends Controller {
       DSL.query.bool.must.push({ term: { recruiting: true } });
     }
     this.add_highlight_DSL(DSL, 'id', 'name', 'username');
-    this.add_multi_sort_DSL(DSL, [ '_score', 'updated_time' ]);
+    this.add_multi_sort_DSL(DSL, [ '_score', 'updated_at' ]);
     return DSL;
   }
 

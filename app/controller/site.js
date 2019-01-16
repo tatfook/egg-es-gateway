@@ -9,7 +9,7 @@ const create_rule = {
   cover: { type: 'string', required: false, allowEmpty: true },
   display_name: { type: 'string', required: false, allowEmpty: true },
   description: { type: 'string', required: false, allowEmpty: true },
-  created_time: 'string',
+  created_at: 'string',
 };
 
 const update_rule = {
@@ -17,7 +17,7 @@ const update_rule = {
   cover: { type: 'string', required: false, allowEmpty: true },
   display_name: { type: 'string', required: false, allowEmpty: true },
   description: { type: 'string', required: false, allowEmpty: true },
-  updated_time: 'string',
+  updated_at: 'string',
 };
 
 const upsert_rule = {
@@ -26,8 +26,8 @@ const upsert_rule = {
   cover: { type: 'string', required: false, allowEmpty: true },
   display_name: { type: 'string', required: false, allowEmpty: true },
   description: { type: 'string', required: false, allowEmpty: true },
-  created_time: 'string',
-  updated_time: { type: 'string', required: false },
+  created_at: 'string',
+  updated_at: { type: 'string', required: false },
 };
 
 class SiteController extends Controller {
@@ -38,13 +38,13 @@ class SiteController extends Controller {
     }
     const {
       id, username, sitename, cover,
-      display_name, description, created_time,
+      display_name, description, created_at,
     } = this.ctx.request.body;
     const data = {
       username, sitename, cover, display_name,
-      description, created_time,
+      description, created_at,
     };
-    data.updated_time = created_time;
+    data.updated_at = created_at;
     const payload = { id, body: data };
     await super.create(payload);
     this.save_suggestions(sitename, display_name);
@@ -65,12 +65,12 @@ class SiteController extends Controller {
       this.ctx.request.body.display_name = this.ctx.request.body.sitename;
     }
     const {
-      username, sitename, cover, display_name, description, created_time, updated_time,
+      username, sitename, cover, display_name, description, created_at, updated_at,
     } = this.ctx.request.body;
     const data = {
-      username, sitename, cover, display_name, description, created_time,
+      username, sitename, cover, display_name, description, created_at,
     };
-    data.updated_time = updated_time || created_time;
+    data.updated_at = updated_at || created_at;
     const payload = { id: this.ctx.params.id, body: data };
     await super.upsert(payload);
     this.save_suggestions(sitename, display_name);
