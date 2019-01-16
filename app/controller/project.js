@@ -130,7 +130,6 @@ class ProjectController extends Controller {
 
   add_query_DSL(DSL) {
     DSL.query = { bool: {
-      should: this.get_should_query(),
       must: this.get_must_query(),
       must_not: this.invisible_DSL,
     } };
@@ -140,8 +139,9 @@ class ProjectController extends Controller {
   get_should_query() {
     const { ctx, max_expansions } = this;
     const q = ctx.query.q;
-    const should = [];
+    let should;
     if (q) {
+      should = [];
       if (Number(q)) {
         should.push({ term: { id: { value: q, boost: 5 } } });
       }
@@ -159,7 +159,9 @@ class ProjectController extends Controller {
 
   get_must_query() {
     const must = [];
+    const should = this.get_should_query();
     const { type, tags, recruiting, recommended } = this.ctx.query;
+    if (should) must.push({ bool: { should } });
     if (type) must.push({ term: { type } });
     if (tags) must.push({ term: { tags } });
     if (recruiting) must.push({ term: { recruiting: true } });
