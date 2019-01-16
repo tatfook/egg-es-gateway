@@ -38,7 +38,7 @@ const upsert_rule = {
   description: { type: 'string', required: false, allowEmpty: true },
   type: 'string',
   recruiting: 'bool',
-  recommended: 'bool',
+  recommended: { type: 'bool', required: false },
   tags: { type: 'array', itemType: 'string', required: false },
   total_like: { type: 'int', required: false },
   total_view: { type: 'int', required: false },
