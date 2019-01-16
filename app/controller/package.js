@@ -48,7 +48,8 @@ class PackageController extends Controller {
     const id = ctx.params.id;
     const data = ctx.params.permit(
       'id', 'title', 'cover', 'total_lessons', 'prize',
-      'description', 'age_min', 'age_max', 'created_at'
+      'description', 'age_min', 'age_max', 'created_at',
+      'updated_at'
     );
     data.updated_at = data.updated_at || data.created_at;
     const payload = { id, body: data };
@@ -77,7 +78,7 @@ class PackageController extends Controller {
     const id = ctx.params.id;
     const data = ctx.params.permit(
       'title', 'cover', 'total_lessons', 'description', 'prize',
-      'age_min', 'age_max', 'recent_view', 'created_at'
+      'age_min', 'age_max', 'recent_view', 'created_at', 'updated_at'
     );
     data.updated_at = data.updated_at || data.created_at;
     const payload = { id, body: data };

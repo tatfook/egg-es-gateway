@@ -32,7 +32,8 @@ class UserController extends Controller {
     ctx.validate(create_rule, ctx.params);
     const id = ctx.params.id;
     const data = ctx.params.permit(
-      'id', 'username', 'portrait', 'created_at', 'nickname'
+      'id', 'username', 'portrait', 'nickname',
+      'created_at', 'updated_at'
     );
     data.updated_at = data.updated_at || data.created_at;
     data.nickname = data.nickname || data.username;
@@ -61,7 +62,7 @@ class UserController extends Controller {
     const id = ctx.params.id;
     const data = ctx.params.permit(
       'id', 'username', 'portrait', 'total_projects', 'total_fans',
-      'total_follows', 'description', 'created_at'
+      'total_follows', 'description', 'created_at', 'updated_at'
     );
     data.updated_at = data.updated_at || data.created_at;
     data.nickname = data.nickname || data.username;

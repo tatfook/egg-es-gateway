@@ -99,6 +99,17 @@ class PagesController extends Controller {
     const data_type = 'page';
     return super.add_location(payload, data_type);
   }
+
+  async index() {
+    if (!this.ctx.params.q) {
+      this.ctx.body = {
+        total: 0,
+        hits: [],
+      };
+      return;
+    }
+    await this.search();
+  }
 }
 
 module.exports = PagesController;

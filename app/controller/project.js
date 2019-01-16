@@ -65,8 +65,8 @@ class ProjectController extends Controller {
     const id = ctx.params.id;
     const data = ctx.params.permit(
       'name', 'cover', 'username', 'user_portrait', 'description',
-      'visibility', 'type', 'recruiting', 'created_at', 'tags',
-      'video', 'id'
+      'visibility', 'type', 'recruiting', 'created_at', 'updated_at',
+      'tags', 'video', 'id'
     );
     data.updated_at = data.created_at;
     const payload = { id, body: data };
@@ -97,9 +97,10 @@ class ProjectController extends Controller {
     const id = ctx.params.id;
     const data = ctx.params.permit(
       'name', 'cover', 'username', 'user_portrait', 'description',
-      'visibility', 'type', 'recruiting', 'created_at', 'tags',
-      'total_like', 'total_view', 'total_mark', 'total_comment',
-      'recent_like', 'recent_view', 'video', 'id', 'recommended'
+      'visibility', 'type', 'recruiting', 'tags', 'total_like',
+      'total_view', 'total_mark', 'total_comment', 'recent_like',
+      'recent_view', 'video', 'id', 'recommended', 'created_at',
+      'updated_at'
     );
     data.updated_at = data.updated_at || data.created_at;
     const payload = { id, body: data };
