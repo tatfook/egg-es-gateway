@@ -83,7 +83,7 @@ class ProjectController extends Controller {
       'type', 'recruiting', 'tags', 'total_like',
       'total_view', 'total_mark', 'total_comment',
       'recent_like', 'recent_view', 'updated_at',
-      'description', 'video', 'recommended', 'id'
+      'description', 'video', 'recommended'
     );
     const data = { doc };
     const payload = { id, body: data };

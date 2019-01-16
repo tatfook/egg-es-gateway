@@ -43,54 +43,46 @@ class PackageController extends Controller {
   }
 
   async create() {
-    this.ctx.validate(create_rule);
-    const {
-      id, title, cover, total_lessons,
-      prize, description, age_min, age_max,
-      created_at, updated_at,
-    } = this.ctx.request.body;
-    const data = {
-      title, cover, total_lessons, prize,
-      description, age_min, age_max, created_at,
-    };
-    data.updated_at = updated_at || created_at;
+    const { ctx } = this;
+    ctx.validate(create_rule, ctx.params);
+    const id = ctx.params.id;
+    const data = ctx.params.permit(
+      'id', 'title', 'cover', 'total_lessons', 'prize',
+      'description', 'age_min', 'age_max', 'created_at'
+    );
+    data.updated_at = data.updated_at || data.created_at;
     const payload = { id, body: data };
     await super.create(payload);
-    this.save_suggestions(title);
+    this.save_suggestions(data.title);
   }
 
   async update() {
-    this.ctx.validate(update_rule);
-    const {
-      title, cover, total_lessons, prize,
-      description, recent_view, age_min, age_max,
-      updated_at,
-    } = this.ctx.request.body;
-    const data = { doc: {
-      title, cover, total_lessons, prize,
-      description, recent_view, age_min, age_max,
-      updated_at,
-    } };
-    const payload = { id: this.ctx.params.id, body: data };
+    const { ctx } = this;
+    ctx.validate(update_rule, ctx.params);
+    const id = ctx.params.id;
+    const doc = ctx.params.permit(
+      'title', 'cover', 'total_lessons', 'prize',
+      'description', 'recent_view', 'age_min', 'age_max',
+      'updated_at'
+    );
+    const data = { doc };
+    const payload = { id, body: data };
     await super.update(payload);
-    if (title) { this.save_suggestions(title); }
+    if (doc.title) { this.save_suggestions(doc.title); }
   }
 
   async upsert() {
-    this.ctx.validate(upsert_rule);
-    const {
-      title, cover, total_lessons, prize,
-      description, age_min, age_max,
-      recent_view, created_at, updated_at,
-    } = this.ctx.request.body;
-    const data = {
-      title, cover, total_lessons, description, prize,
-      age_min, age_max, recent_view, created_at,
-    };
-    data.updated_at = updated_at || created_at;
-    const payload = { id: this.ctx.params.id, body: data };
+    const { ctx } = this;
+    ctx.validate(upsert_rule, ctx.params);
+    const id = ctx.params.id;
+    const data = ctx.params.permit(
+      'title', 'cover', 'total_lessons', 'description', 'prize',
+      'age_min', 'age_max', 'recent_view', 'created_at'
+    );
+    data.updated_at = data.updated_at || data.created_at;
+    const payload = { id, body: data };
     await super.upsert(payload);
-    this.save_suggestions(title);
+    this.save_suggestions(data.title);
   }
 
   add_location(payload) {
@@ -99,15 +91,26 @@ class PackageController extends Controller {
   }
 
   get_search_DSL() {
-    const DSL = {
-      query: {
-        bool: {
-        },
-      },
-    };
-    if (this.ctx.query.q) {
-      const max_expansions = this.max_expansions;
-      DSL.query.bool.should = [
+    const DSL = {};
+    this.add_query_DSL(DSL);
+    this.add_highlight_DSL(DSL, 'title', 'description');
+    this.add_multi_sort_DSL(DSL, [ '_score', 'updated_at' ]);
+    return DSL;
+  }
+
+  add_query_DSL(DSL) {
+    DSL.query = { bool: {
+      should: this.get_should_query(),
+    } };
+    return DSL;
+  }
+
+  get_should_query() {
+    const { ctx, max_expansions } = this;
+    const q = ctx.query.q;
+    let should;
+    if (q) {
+      should = [
         { term: { 'title.keyword': { value: this.ctx.query.q, boost: 3 } } },
         { prefix: { username: { value: this.ctx.query.q, boost: 2 } } },
         { multi_match: {
@@ -117,8 +120,7 @@ class PackageController extends Controller {
         { wildcard: { title: `*${this.ctx.query.q}*` } },
       ];
     }
-    this.add_highlight_DSL(DSL, 'title', 'description');
-    return this.add_multi_sort_DSL(DSL, [ '_score', 'updated_at' ]);
+    return should;
   }
 
   wrap_search_result(result) {
