@@ -60,63 +60,51 @@ class ProjectController extends Controller {
   }
 
   async create() {
-    this.ctx.validate(create_rule);
-    const {
-      id, name, cover, username, user_portrait, description,
-      visibility, type, recruiting, created_at, tags, video,
-    } = this.ctx.request.body;
-    const data = {
-      name, cover, username, user_portrait, description,
-      visibility, type, recruiting, created_at, tags,
-      video, id,
-    };
-    data.updated_at = created_at;
+    const { ctx } = this;
+    ctx.validate(create_rule, ctx.params);
+    const id = ctx.params.id;
+    const data = ctx.params.permit(
+      'name', 'cover', 'username', 'user_portrait', 'description',
+      'visibility', 'type', 'recruiting', 'created_at', 'tags',
+      'video', 'id'
+    );
+    data.updated_at = data.created_at;
     const payload = { id, body: data };
     await super.create(payload);
-    this.save_suggestions(name);
+    this.save_suggestions(data.name);
   }
 
   async update() {
-    this.ctx.validate(update_rule);
-    const {
-      name, cover, user_portrait, visibility,
-      type, recruiting, tags, total_like,
-      total_view, total_mark, total_comment,
-      recent_like, recent_view, updated_at,
-      description, video, recommended,
-    } = this.ctx.request.body;
-    const data = { doc: {
-      name, cover, user_portrait, visibility,
-      type, recruiting, tags, total_like,
-      total_view, total_mark, total_comment,
-      recent_like, recent_view, updated_at,
-      description, video, recommended,
-    } };
-    const payload = { id: this.ctx.params.id, body: data };
+    const { ctx } = this;
+    ctx.validate(update_rule, ctx.params);
+    const id = ctx.params.id;
+    const doc = ctx.params.permit(
+      'name', 'cover', 'user_portrait', 'visibility',
+      'type', 'recruiting', 'tags', 'total_like',
+      'total_view', 'total_mark', 'total_comment',
+      'recent_like', 'recent_view', 'updated_at',
+      'description', 'video', 'recommended', 'id'
+    );
+    const data = { doc };
+    const payload = { id, body: data };
     await super.update(payload);
-    if (name) this.save_suggestions(name);
+    if (doc.name) this.save_suggestions(doc.name);
   }
 
   async upsert() {
-    this.ctx.validate(upsert_rule);
-    const id = this.ctx.params.id;
-    const {
-      name, cover, username, user_portrait, description,
-      visibility, type, recruiting, created_at,
-      updated_at, tags, total_like, total_view,
-      total_mark, total_comment, recent_like, recent_view,
-      video, recommended,
-    } = this.ctx.request.body;
-    const data = {
-      name, cover, username, user_portrait, description,
-      visibility, type, recruiting, created_at, tags,
-      total_like, total_view, total_mark, total_comment,
-      recent_like, recent_view, video, id, recommended,
-    };
-    data.updated_at = updated_at || created_at;
+    const { ctx } = this;
+    ctx.validate(upsert_rule, ctx.params);
+    const id = ctx.params.id;
+    const data = ctx.params.permit(
+      'name', 'cover', 'username', 'user_portrait', 'description',
+      'visibility', 'type', 'recruiting', 'created_at', 'tags',
+      'total_like', 'total_view', 'total_mark', 'total_comment',
+      'recent_like', 'recent_view', 'video', 'id', 'recommended'
+    );
+    data.updated_at = data.updated_at || data.created_at;
     const payload = { id, body: data };
     await super.upsert(payload);
-    this.save_suggestions(name);
+    this.save_suggestions(data.name);
   }
 
   add_location(payload) {
@@ -133,49 +121,50 @@ class ProjectController extends Controller {
   }
 
   get_search_DSL() {
-    const DSL = {
-      query: {
-        bool: {
-          must: [],
-          must_not: this.invisible_DSL,
-        },
-      },
-    };
-    if (this.ctx.query.q) {
-      const max_expansions = this.max_expansions;
-      const match_condition = {
-        bool: {
-          should: [
-            { term: { 'name.keyword': { value: this.ctx.query.q, boost: 3 } } },
-            { prefix: { username: { value: this.ctx.query.q, boost: 2 } } },
-            { match_phrase_prefix: {
-              name: { query: this.ctx.query.q, max_expansions, boost: 2 },
-            } },
-            { wildcard: { name: `*${this.ctx.query.q}*` } },
-          ],
-        },
-      };
-      if (Number(this.ctx.query.q)) {
-        const id_query = { term: { id: { value: this.ctx.query.q, boost: 5 } } };
-        match_condition.bool.should = [ id_query ].concat(match_condition.bool.should);
-      }
-      DSL.query.bool.must.push(match_condition);
-    }
-    if (this.ctx.query.type) {
-      DSL.query.bool.must.push({ term: { type: this.ctx.query.type } });
-    }
-    if (this.ctx.query.tags) {
-      DSL.query.bool.must.push({ term: { tags: this.ctx.query.tags } });
-    }
-    if (this.ctx.query.recruiting) {
-      DSL.query.bool.must.push({ term: { recruiting: true } });
-    }
-    if (this.ctx.query.recommended) {
-      DSL.query.bool.must.push({ term: { recommended: true } });
-    }
+    const DSL = {};
+    this.add_query_DSL(DSL);
     this.add_highlight_DSL(DSL, 'id', 'name', 'username');
     this.add_multi_sort_DSL(DSL, [ '_score', 'updated_at' ]);
     return DSL;
+  }
+
+  add_query_DSL(DSL) {
+    DSL.query = { bool: {
+      should: this.get_should_query(),
+      must: this.get_must_query(),
+      must_not: this.invisible_DSL,
+    } };
+    return DSL;
+  }
+
+  get_should_query() {
+    const { ctx, max_expansions } = this;
+    const q = ctx.query.q;
+    const should = [];
+    if (q) {
+      if (Number(q)) {
+        should.push({ term: { id: { value: q, boost: 5 } } });
+      }
+      should.push(
+        { term: { 'name.keyword': { value: q, boost: 3 } } },
+        { prefix: { username: { value: q, boost: 2 } } },
+        { match_phrase_prefix: {
+          name: { query: q, max_expansions, boost: 2 },
+        } },
+        { wildcard: { name: `*${q}*` } }
+      );
+    }
+    return should;
+  }
+
+  get_must_query() {
+    const must = [];
+    const { type, tags, recruiting, recommended } = this.ctx.query;
+    if (type) must.push({ term: { type } });
+    if (tags) must.push({ term: { tags } });
+    if (recruiting) must.push({ term: { recruiting: true } });
+    if (recommended) must.push({ term: { recommended: true } });
+    return must;
   }
 
   wrap_search_result(result) {
