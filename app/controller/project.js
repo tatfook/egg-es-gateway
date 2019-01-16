@@ -20,6 +20,7 @@ const update_rule = {
   description: { type: 'string', required: false, allowEmpty: true },
   type: { type: 'string', required: false },
   recruiting: { type: 'boolean', required: false },
+  recommended: { type: 'boolean', required: false },
   tags: { type: 'array', itemType: 'string', required: false },
   total_like: { type: 'int', required: false },
   total_view: { type: 'int', required: false },
@@ -37,6 +38,7 @@ const upsert_rule = {
   description: { type: 'string', required: false, allowEmpty: true },
   type: 'string',
   recruiting: 'bool',
+  recommended: 'bool',
   tags: { type: 'array', itemType: 'string', required: false },
   total_like: { type: 'int', required: false },
   total_view: { type: 'int', required: false },
@@ -81,14 +83,14 @@ class ProjectController extends Controller {
       type, recruiting, tags, total_like,
       total_view, total_mark, total_comment,
       recent_like, recent_view, updated_at,
-      description, video,
+      description, video, recommended,
     } = this.ctx.request.body;
     const data = { doc: {
       name, cover, user_portrait, visibility,
       type, recruiting, tags, total_like,
       total_view, total_mark, total_comment,
       recent_like, recent_view, updated_at,
-      description, video,
+      description, video, recommended,
     } };
     const payload = { id: this.ctx.params.id, body: data };
     await super.update(payload);
@@ -103,13 +105,13 @@ class ProjectController extends Controller {
       visibility, type, recruiting, created_at,
       updated_at, tags, total_like, total_view,
       total_mark, total_comment, recent_like, recent_view,
-      video,
+      video, recommended,
     } = this.ctx.request.body;
     const data = {
       name, cover, username, user_portrait, description,
       visibility, type, recruiting, created_at, tags,
       total_like, total_view, total_mark, total_comment,
-      recent_like, recent_view, video, id,
+      recent_like, recent_view, video, id, recommended,
     };
     data.updated_at = updated_at || created_at;
     const payload = { id, body: data };
@@ -167,6 +169,9 @@ class ProjectController extends Controller {
     }
     if (this.ctx.query.recruiting) {
       DSL.query.bool.must.push({ term: { recruiting: true } });
+    }
+    if (this.ctx.query.recommended) {
+      DSL.query.bool.must.push({ term: { recommended: true } });
     }
     this.add_highlight_DSL(DSL, 'id', 'name', 'username');
     this.add_multi_sort_DSL(DSL, [ '_score', 'updated_at' ]);
