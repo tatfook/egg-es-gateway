@@ -28,46 +28,46 @@ const upsert_rule = {
 
 class UserController extends Controller {
   async create() {
-    this.ctx.validate(create_rule);
-    const { id, username, nickname, portrait, created_at } = this.ctx.request.body;
-    const data = { username, portrait, created_at };
-    data.updated_at = created_at;
-    data.nickname = nickname || username;
+    const { ctx } = this;
+    ctx.validate(create_rule, ctx.params);
+    const id = ctx.params.id;
+    const data = ctx.params.permit(
+      'username', 'portrait', 'created_at', 'nickname'
+    );
+    data.updated_at = data.updated_at || data.created_at;
+    data.nickname = data.nickname || data.username;
     const payload = { id, body: data };
     await super.create(payload);
-    this.save_suggestions(username, nickname);
+    this.save_suggestions(data.username, data.nickname);
   }
 
   async update() {
-    this.ctx.validate(update_rule);
-    const {
-      nickname, portrait, total_projects, total_fans,
-      description, total_follows, updated_at,
-    } = this.ctx.request.body;
-    const data = { doc: {
-      nickname, portrait, total_projects, total_fans,
-      description, total_follows, updated_at,
-    } };
-    const payload = { id: this.ctx.params.id, body: data };
+    const { ctx } = this;
+    ctx.validate(update_rule, ctx.params);
+    const id = ctx.params.id;
+    const doc = ctx.params.permit(
+      'id', 'nickname', 'portrait', 'total_projects', 'total_fans',
+      'description', 'total_follows', 'updated_at'
+    );
+    const data = { doc };
+    const payload = { id, body: data };
     await super.update(payload);
-    if (nickname) { this.save_suggestions(nickname); }
+    if (doc.nickname) { this.save_suggestions(doc.nickname); }
   }
 
   async upsert() {
-    this.ctx.validate(upsert_rule);
-    const {
-      username, nickname, portrait, total_projects, total_fans,
-      total_follows, description, created_at, updated_at,
-    } = this.ctx.request.body;
-    const data = {
-      username, portrait, total_projects, total_fans,
-      total_follows, description, created_at,
-    };
-    data.updated_at = updated_at || created_at;
-    data.nickname = nickname || username;
-    const payload = { id: this.ctx.params.id, body: data };
+    const { ctx } = this;
+    ctx.validate(upsert_rule, ctx.params);
+    const id = ctx.params.id;
+    const data = ctx.params.permit(
+      'username', 'portrait', 'total_projects', 'total_fans',
+      'total_follows', 'description', 'created_at'
+    );
+    data.updated_at = data.updated_at || data.created_at;
+    data.nickname = data.nickname || data.username;
+    const payload = { id, body: data };
     await super.upsert(payload);
-    this.save_suggestions(username, nickname);
+    this.save_suggestions(data.username, data.nickname);
   }
 
   add_location(payload) {
@@ -76,25 +76,37 @@ class UserController extends Controller {
   }
 
   get_search_DSL() {
-    const DSL = {
-      query: {
-        bool: {},
-      },
-    };
-    if (this.ctx.query.q) {
-      const max_expansions = this.max_expansions;
-      DSL.query.bool.should = [
-        { term: { 'username.keyword': { value: this.ctx.query.q, boost: 3 } } },
-        { prefix: { username: { value: this.ctx.query.q, boost: 2 } } },
+    const DSL = {};
+    this.add_query_DSL(DSL);
+    this.add_highlight_DSL(DSL, 'username', 'nickname');
+    this.add_multi_sort_DSL(DSL, [ '_score', 'updated_at' ]);
+    return DSL;
+  }
+
+  add_query_DSL(DSL) {
+    DSL.query = { bool: {
+      should: this.get_should_query(),
+    } };
+    return DSL;
+  }
+
+  get_should_query() {
+    const { ctx, max_expansions } = this;
+    const q = ctx.query.q;
+    let should;
+    if (q) {
+      should = [
+        { term: { 'username.keyword': { value: q, boost: 3 } } },
+        { prefix: { username: { value: q, boost: 2 } } },
         { multi_match: {
-          fields: [ 'username', 'nickname' ], query: this.ctx.query.q,
+          fields: [ 'username', 'nickname' ], query: q,
           type: 'phrase_prefix', max_expansions,
         } },
-        { wildcard: { username: `*${this.ctx.query.q}*` } },
-        { wildcard: { nickname: `*${this.ctx.query.q}*` } },
+        { wildcard: { username: `*${q}*` } },
+        { wildcard: { nickname: `*${q}*` } },
       ];
     }
-    return this.add_multi_sort_DSL(DSL, [ '_score', 'updated_at' ]);
+    return should;
   }
 
   wrap_search_result(result) {
