@@ -11,6 +11,7 @@ const create_rule = {
   recruiting: 'bool',
   description: { type: 'string', required: false, allowEmpty: true },
   tags: { type: 'array', itemType: 'string', required: false },
+  sys_tags: { type: 'array', itemType: 'string', required: false },
   created_at: 'string',
 };
 
@@ -22,6 +23,7 @@ const update_rule = {
   recruiting: { type: 'boolean', required: false },
   recommended: { type: 'boolean', required: false },
   tags: { type: 'array', itemType: 'string', required: false },
+  sys_tags: { type: 'array', itemType: 'string', required: false },
   total_like: { type: 'int', required: false },
   total_view: { type: 'int', required: false },
   total_mark: { type: 'int', required: false },
@@ -40,6 +42,7 @@ const upsert_rule = {
   recruiting: 'bool',
   recommended: { type: 'bool', required: false },
   tags: { type: 'array', itemType: 'string', required: false },
+  sys_tags: { type: 'array', itemType: 'string', required: false },
   total_like: { type: 'int', required: false },
   total_view: { type: 'int', required: false },
   total_mark: { type: 'int', required: false },
@@ -66,7 +69,7 @@ class ProjectController extends Controller {
     const data = ctx.params.permit(
       'name', 'cover', 'username', 'user_portrait', 'description',
       'visibility', 'type', 'recruiting', 'created_at', 'updated_at',
-      'tags', 'video', 'id'
+      'tags', 'sys_tags', 'video', 'id'
     );
     data.updated_at = data.created_at;
     const payload = { id, body: data };
@@ -83,7 +86,7 @@ class ProjectController extends Controller {
       'type', 'recruiting', 'tags', 'total_like',
       'total_view', 'total_mark', 'total_comment',
       'recent_like', 'recent_view', 'updated_at',
-      'description', 'video', 'recommended'
+      'description', 'video', 'recommended', 'sys_tags'
     );
     const data = { doc };
     const payload = { id, body: data };
@@ -100,7 +103,7 @@ class ProjectController extends Controller {
       'visibility', 'type', 'recruiting', 'tags', 'total_like',
       'total_view', 'total_mark', 'total_comment', 'recent_like',
       'recent_view', 'video', 'id', 'recommended', 'created_at',
-      'updated_at'
+      'updated_at', 'sys_tags'
     );
     data.updated_at = data.updated_at || data.created_at;
     const payload = { id, body: data };
@@ -161,10 +164,11 @@ class ProjectController extends Controller {
   get_must_query() {
     const must = [];
     const should = this.get_should_query();
-    const { type, tags, recruiting, recommended } = this.ctx.query;
+    const { type, sys_tags, tags, recruiting, recommended } = this.ctx.query;
     if (should) must.push({ bool: { should } });
     if (type) must.push({ term: { type } });
     if (tags) must.push({ term: { tags } });
+    if (sys_tags) must.push({ term: { sys_tags } });
     if (recruiting) must.push({ term: { recruiting: true } });
     if (recommended) must.push({ term: { recommended: true } });
     return must;
