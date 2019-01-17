@@ -24,6 +24,7 @@ const update_rule = {
   recommended: { type: 'boolean', required: false },
   tags: { type: 'array', itemType: 'string', required: false },
   sys_tags: { type: 'array', itemType: 'string', required: false },
+  point: { type: 'number', required: false },
   total_like: { type: 'int', required: false },
   total_view: { type: 'int', required: false },
   total_mark: { type: 'int', required: false },
@@ -43,6 +44,7 @@ const upsert_rule = {
   recommended: { type: 'bool', required: false },
   tags: { type: 'array', itemType: 'string', required: false },
   sys_tags: { type: 'array', itemType: 'string', required: false },
+  point: { type: 'number', required: false },
   total_like: { type: 'int', required: false },
   total_view: { type: 'int', required: false },
   total_mark: { type: 'int', required: false },
@@ -67,9 +69,10 @@ class ProjectController extends Controller {
     ctx.validate(create_rule, ctx.params);
     const id = ctx.params.id;
     const data = ctx.params.permit(
-      'name', 'cover', 'username', 'user_portrait', 'description',
-      'visibility', 'type', 'recruiting', 'created_at', 'updated_at',
-      'tags', 'sys_tags', 'video', 'id'
+      'name', 'cover', 'username', 'user_portrait',
+      'description', 'visibility', 'type', 'recruiting',
+      'created_at', 'updated_at', 'id', 'tags',
+      'sys_tags', 'video'
     );
     data.updated_at = data.created_at;
     const payload = { id, body: data };
@@ -86,7 +89,8 @@ class ProjectController extends Controller {
       'type', 'recruiting', 'tags', 'total_like',
       'total_view', 'total_mark', 'total_comment',
       'recent_like', 'recent_view', 'updated_at',
-      'description', 'video', 'recommended', 'sys_tags'
+      'description', 'video', 'recommended', 'sys_tags',
+      'point'
     );
     const data = { doc };
     const payload = { id, body: data };
@@ -103,7 +107,7 @@ class ProjectController extends Controller {
       'visibility', 'type', 'recruiting', 'tags', 'total_like',
       'total_view', 'total_mark', 'total_comment', 'recent_like',
       'recent_view', 'video', 'id', 'recommended', 'created_at',
-      'updated_at', 'sys_tags'
+      'updated_at', 'sys_tags', 'point'
     );
     data.updated_at = data.updated_at || data.created_at;
     const payload = { id, body: data };
