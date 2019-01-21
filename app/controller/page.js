@@ -66,7 +66,7 @@ class PagesController extends Controller {
 
   async destroy_site() {
     const { ctx, service } = this;
-    // ctx.ensureAdmin();
+    ctx.ensureAdmin();
     ctx.validate(delete_site_rule, ctx.params);
     const query = { body: this.get_site_DSL() };
     const query_with_location = this.add_location(query);
@@ -78,7 +78,7 @@ class PagesController extends Controller {
 
   async update_visibility() {
     const { ctx, service } = this;
-    // ctx.ensureAdmin();
+    ctx.ensureAdmin();
     ctx.validate(update_site_visibility_rule, ctx.params);
     const query = { body: this.get_update_visibility_DSL() };
     const query_with_location = this.add_location(query);

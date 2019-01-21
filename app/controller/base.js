@@ -23,64 +23,64 @@ class baseController extends Controller {
   }
 
   async search(DSL = this.get_search_DSL()) {
-    const { ctx } = this;
+    const { ctx, service } = this;
     const [ from, size ] = ctx.helper.paginate(ctx.query);
     const query = { from, size, body: DSL };
     const query_with_location = this.add_location(query);
-    const result = await this.service.es.client.search(query_with_location)
+    const result = await service.es.client.search(query_with_location)
       .catch(err => this.error(err));
     ctx.body = this.wrap_search_result(result);
   }
 
   async show() {
-    const { ctx } = this;
+    const { ctx, service } = this;
     ctx.ensureAdmin();
     const query = { id: ctx.params.id };
     const query_with_location = this.add_location(query);
-    const res = await this.service.es.client.get(query_with_location)
+    const res = await service.es.client.get(query_with_location)
       .catch(err => this.error(err));
     ctx.body = res._source;
   }
 
   async create(payload) {
-    const { ctx } = this;
+    const { ctx, service } = this;
     ctx.ensureAdmin();
     const payload_with_location = this.add_location(payload);
-    await this.service.es.client.create(payload_with_location)
+    await service.es.client.create(payload_with_location)
       .catch(err => this.error(err));
     this.created();
   }
 
   async update(payload) {
-    const { ctx } = this;
+    const { ctx, service } = this;
     ctx.ensureAdmin();
     const payload_with_location = this.add_location(payload);
-    await this.service.es.client.update(payload_with_location)
+    await service.es.client.update(payload_with_location)
       .catch(err => this.error(err));
     this.updated();
   }
 
   async upsert(payload) {
-    const { ctx } = this;
+    const { ctx, service } = this;
     ctx.ensureAdmin();
     const payload_with_location = this.add_location(payload);
-    await this.service.es.client.index(payload_with_location)
+    await service.es.client.index(payload_with_location)
       .catch(err => this.error(err));
     this.upserted();
   }
 
   async destroy() {
-    const { ctx } = this;
+    const { ctx, service } = this;
     ctx.ensureAdmin();
     const query = { id: ctx.params.id };
     const query_with_location = this.add_location(query);
-    await this.service.es.client.delete(query_with_location)
+    await service.es.client.delete(query_with_location)
       .catch(err => this.error(err));
     this.deleted();
   }
 
   async bulk() {
-    const { ctx } = this;
+    const { ctx, service } = this;
     ctx.validate(bulk_rule);
     ctx.ensureAdmin();
     const params = {
@@ -88,7 +88,7 @@ class baseController extends Controller {
       type: ctx.params.type,
       index: ctx.params.index,
     };
-    const response = await this.service.es.client.bulk(params)
+    const response = await service.es.client.bulk(params)
       .catch(err => this.error(err));
     ctx.body = response;
   }
@@ -179,7 +179,7 @@ class baseController extends Controller {
 
   // api for query words suggestion
   async suggest() {
-    const { ctx } = this;
+    const { ctx, service } = this;
     ctx.validate(suggestions_rule, ctx.query);
     const query = {
       body: {
@@ -193,20 +193,20 @@ class baseController extends Controller {
       },
       index: 'suggestions',
     };
-    const result = await this.service.es.client.suggest(query)
+    const result = await service.es.client.suggest(query)
       .catch(err => this.error(err));
     ctx.body = this.wrap_suggestions(result);
   }
 
   async save_suggestions(...keywords) {
-    const { ctx } = this;
+    const { ctx, service } = this;
     const tasks = [];
     const already_exist = {};
     for (const keyword of keywords) {
       if (!keyword || already_exist[keyword]) { continue; }
       already_exist[keyword] = true;
       const pinyin = ctx.helper.hanzi_to_pinyin(keyword);
-      tasks.push(this.service.es.client.create({
+      tasks.push(service.es.client.create({
         index: 'suggestions',
         type: 'suggestions',
         id: ctx.helper.to_sha1(keyword),
