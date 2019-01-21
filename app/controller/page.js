@@ -25,6 +25,17 @@ const update_rule = {
   updated_at: 'string',
 };
 
+const delete_site_rule = {
+  sitename: 'string',
+  username: 'string',
+};
+
+const update_site_visibility_rule = {
+  sitename: 'string',
+  username: 'string',
+  visibility: [ 'public', 'private' ],
+};
+
 class PagesController extends Controller {
   async create() {
     const { ctx } = this;
@@ -51,6 +62,66 @@ class PagesController extends Controller {
     const payload = { id, body };
     await super.update(payload);
     if (doc.title) this.save_suggestions(doc.title);
+  }
+
+  async destroy_site() {
+    const { ctx, service } = this;
+    // ctx.ensureAdmin();
+    ctx.validate(delete_site_rule, ctx.params);
+    const query = { body: this.get_site_DSL() };
+    const query_with_location = this.add_location(query);
+    const response = await service.es.client
+      .deleteByQuery(query_with_location)
+      .catch(err => this.error(err));
+    ctx.body = response;
+  }
+
+  async update_visibility() {
+    const { ctx, service } = this;
+    // ctx.ensureAdmin();
+    ctx.validate(update_site_visibility_rule, ctx.params);
+    const query = { body: this.get_update_visibility_DSL() };
+    const query_with_location = this.add_location(query);
+    const response = await service.es.client
+      .updateByQuery(query_with_location)
+      .catch(err => this.error(err));
+    ctx.body = response;
+  }
+
+  get_site_DSL() {
+    const DSL = {};
+    this.add_site_query_DSL(DSL);
+    return DSL;
+  }
+
+  get_update_visibility_DSL() {
+    const DSL = this.get_site_DSL();
+    this.add_update_visibility_DSL(DSL);
+    return DSL;
+  }
+
+  add_update_visibility_DSL(DSL) {
+    const { ctx } = this;
+    DSL.script = {
+      source: `ctx._source.visibility = "${ctx.params.visibility}"`,
+      lang: 'painless',
+    };
+    return DSL;
+  }
+
+  add_site_query_DSL(DSL) {
+    const { ctx } = this;
+    const site = ctx.params.sitename;
+    const username = ctx.params.username;
+    DSL.query = {
+      bool: {
+        must: [
+          { term: { username } },
+          { term: { site } },
+        ],
+      },
+    };
+    return DSL;
   }
 
   get_search_DSL() {

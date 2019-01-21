@@ -8,26 +8,28 @@ module.exports = app => {
   const url_prefix = app.config.url_prefix;
   if (url_prefix) { router.prefix(url_prefix); }
 
+  const { base, user, project, page } = controller;
+  const lesson = controller.package;
+
   router.get('/', controller.home.index);
 
-  router.post('/bulk', controller.base.bulk);
+  router.post('/bulk', base.bulk);
+  router.get('/suggestions', project.suggest);
 
-  router.resources('/users', controller.user);
-  router.post('/users/:id/upsert', controller.user.upsert);
+  router.resources('/users', user);
+  router.post('/users/:id/upsert', user.upsert);
 
-  router.resources('/packages', controller.package);
-  router.post('/packages/:id/upsert', controller.package.upsert);
-  router.get('/hots/packages', controller.package.hots);
+  router.resources('/packages', lesson);
+  router.post('/packages/:id/upsert', lesson.upsert);
+  router.get('/hots/packages', lesson.hots);
 
-  router.resources('/projects', controller.project);
-  router.post('/projects/:id/upsert', controller.project.upsert);
-  router.get('/hots/projects', controller.project.hots);
-  router.get('/likes/projects', controller.project.likes);
+  router.resources('/projects', project);
+  router.post('/projects/:id/upsert', project.upsert);
+  router.get('/hots/projects', project.hots);
+  router.get('/likes/projects', project.likes);
 
-  router.resources('/sites', controller.site);
-  router.post('/sites/:id/upsert', controller.site.upsert);
+  router.put('/sites/:username/:sitename/visibility', page.update_visibility);
+  router.del('/sites/:username/:sitename', page.destroy_site);
+  router.resources('/pages', page);
 
-  router.resources('/pages', controller.page);
-
-  router.get('/suggestions', controller.project.suggest);
 };
