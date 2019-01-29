@@ -13,7 +13,7 @@ describe('test/app/test/controller/base.test.js', () => {
     const index = 'pages';
     return app.httpRequest()
       .post('/bulk')
-      .set({ Authorization: app.token })
+      .set(app.auth_header)
       .send({ body, index, type })
       .expect(200);
   });

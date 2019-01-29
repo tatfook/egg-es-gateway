@@ -5,33 +5,26 @@ const Router = require('koa-router');
 module.exports = (app, data) => {
   const router = new Router();
 
+  const OK = ctx => {
+    ctx.body = { success: true };
+  };
+
   router.post('/:index/:type/_search', ctx => {
     const { index } = ctx.params;
-    const hits = data[index] || [];
-    const total = hits.length;
-    ctx.body = { total, hits };
+    const resources = data[index] || [];
+    ctx.body = {
+      timeout: false,
+      hits: {
+        hits: resources,
+        total: resources.length,
+      },
+    };
   });
 
-  router.post('/:index/:type/_bulk', ctx => {
-    ctx.body = { success: true };
-  });
-
-
-  router.post('/:index/:type/_update_by_query', ctx => {
-    ctx.body = { success: true };
-  });
-
-  router.post('/:index/:type/_delete_by_query', ctx => {
-    ctx.body = { success: true };
-  });
-
-  router.all('/:index/:type', ctx => {
-    ctx.body = { success: true };
-  });
-
-  router.all('/:index/:type:/:_id', ctx => {
-    ctx.body = { success: true };
-  });
+  router
+    .all('/:index/:type', OK)
+    .all('/:index/:type/:whatever', OK)
+    .all('/:index/:type/:whatever1/:whatever2', OK);
 
   app.use(router.routes()).use(router.allowedMethods());
 };

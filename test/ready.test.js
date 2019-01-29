@@ -13,8 +13,8 @@ before(async () => {
   mockServer = await runMockServer(mockServerConfig);
 
   const secret = app.config.jwt.secret;
-  const token = jwt.encode({ roleId: 10 }, secret, 'HS1');
-  app.token = `Bearer ${token}`;
+  const token = `Bearer ${jwt.encode({ roleId: 10 }, secret, 'HS1')}`;
+  app.auth_header = { Authorization: token };
 });
 
 after(() => {

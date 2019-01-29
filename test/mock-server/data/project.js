@@ -5,13 +5,14 @@ const _ = require('lodash');
 
 const number_limit = { min: 0, max: 1000 };
 const types = [ 'website', 'paracraft' ];
+const total = 20;
 
-const projects = _.times(100, n => {
+const projects = _.times(total, n => {
   const project = {
     _index: 'projects',
     _type: 'projects',
     _id: n,
-    _score: (1 - n / 100),
+    _score: (1 - n / total),
     _source: {
       name: faker.commerce.productName(),
       cover: faker.image.avatar(),
