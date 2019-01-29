@@ -21,7 +21,9 @@
     "egg-ci": "^1.8.0",
     "egg-mock": "^3.14.0",
     "eslint": "^4.11.0",
-    "eslint-config-egg": "^6.0.0"
+    "eslint-config-egg": "^6.0.0",
+    "faker": "^4.1.0",
+    "lodash": "^4.17.11"
   },
   "engines": {
     "node": ">=8.9.0"
