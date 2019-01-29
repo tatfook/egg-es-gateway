@@ -2,7 +2,7 @@
 
 const { app } = require('egg-mock/bootstrap');
 
-describe('app/test/controller/base.test.js', async () => {
+describe('test/app/test/controller/base.test.js', () => {
   it('should POST /bulk', () => {
     const body = [
       { create: { _id: 15 } },

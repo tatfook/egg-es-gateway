@@ -12,11 +12,16 @@ module.exports = (app, data) => {
     ctx.body = { total, hits };
   });
 
-  router.post('/_bulk', ctx => {
+  router.post('/:index/:type/_bulk', ctx => {
     ctx.body = { success: true };
   });
 
-  router.post('/:index/:type/_bulk', ctx => {
+
+  router.post('/:index/:type/_update_by_query', ctx => {
+    ctx.body = { success: true };
+  });
+
+  router.post('/:index/:type/_delete_by_query', ctx => {
     ctx.body = { success: true };
   });
 
