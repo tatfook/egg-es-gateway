@@ -18,4 +18,7 @@ module.exports = {
     hasher.update(str);
     return hasher.digest('hex');
   },
+  parseQuery(query) {
+    return query.split('|');
+  },
 };

@@ -168,14 +168,29 @@ class ProjectController extends Controller {
   get_must_query() {
     const must = [];
     const should = this.get_should_query();
-    const { type, sys_tags, tags, recruiting, recommended } = this.ctx.query;
+    const { type, tags, recruiting, recommended } = this.ctx.query;
     if (should) must.push({ bool: { should } });
     if (type) must.push({ term: { type } });
     if (tags) must.push({ term: { tags } });
-    if (sys_tags) must.push({ term: { sys_tags } });
     if (recruiting) must.push({ term: { recruiting: true } });
     if (recommended) must.push({ term: { recommended: true } });
+    this.add_sys_tags_query(must);
     return must;
+  }
+
+  add_sys_tags_query(must) {
+    const { ctx } = this;
+    const { sys_tags } = this.ctx.query;
+    if (sys_tags) {
+      try {
+        const parsed = ctx.helper.parseQuery(sys_tags);
+        for (const sys_tag of parsed) {
+          must.push({ term: { sys_tags: sys_tag } });
+        }
+      } catch (e) {
+        ctx.throw(400, 'invalid sys_tags');
+      }
+    }
   }
 
   wrap_search_result(result) {
