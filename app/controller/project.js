@@ -161,6 +161,16 @@ class ProjectController extends Controller {
         } },
         { wildcard: { name: `*${q}*` } }
       );
+
+      if (q.includes(' ')) {
+        const filtered = ctx.helper.filterSubStr(q, ' ');
+        should.push(
+          { term: { 'name.keyword': { value: filtered, boost: 3 } } },
+          { match_phrase_prefix: {
+            name: { query: filtered, max_expansions, boost: 2 },
+          } }
+        );
+      }
     }
     return should;
   }
