@@ -150,6 +150,11 @@ class PagesController extends Controller {
         { match_phrase_prefix: { title: { query: q, max_expansions } } },
         { match_phrase_prefix: { url: { query: q, max_expansions } } },
       ];
+
+      if (q.includes(' ')) {
+        const filtered = ctx.helper.filterSubStr(q, ' ');
+        should.push({ match_phrase: { content: { query: filtered } } });
+      }
       return should;
     }
   }
