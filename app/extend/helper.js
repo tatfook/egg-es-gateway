@@ -21,4 +21,12 @@ module.exports = {
   parseQuery(query) {
     return query.split('|');
   },
+  filterSubStr(str, subStr) {
+    const splited = str.split(subStr);
+    let filtered = '';
+    splited.forEach(v => {
+      filtered += v;
+    });
+    return filtered;
+  },
 };
