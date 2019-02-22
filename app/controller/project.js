@@ -132,7 +132,7 @@ class ProjectController extends Controller {
     const DSL = {};
     this.add_query_DSL(DSL);
     this.add_highlight_DSL(DSL, 'id', 'name', 'username');
-    this.add_multi_sort_DSL(DSL, [ '_score', 'updated_at' ]);
+    this.add_multi_sort_DSL(DSL);
     return DSL;
   }
 

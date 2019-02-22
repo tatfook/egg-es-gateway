@@ -95,7 +95,7 @@ class PackageController extends Controller {
     const DSL = {};
     this.add_query_DSL(DSL);
     this.add_highlight_DSL(DSL, 'title', 'description');
-    this.add_multi_sort_DSL(DSL, [ '_score', 'updated_at' ]);
+    this.add_multi_sort_DSL(DSL);
     return DSL;
   }
 

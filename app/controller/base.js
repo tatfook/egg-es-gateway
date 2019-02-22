@@ -10,6 +10,10 @@ const bulk_rule = {
   body: 'array',
 };
 
+const score_field = '_score';
+const updated_at_field = 'updated_at';
+const desc_sort = 'desc';
+
 class baseController extends Controller {
   add_location(payload, data_type, index_only) {
     const { index, type } = this.config.elasticsearch.locations[data_type];
@@ -134,7 +138,7 @@ class baseController extends Controller {
     if (field) {
       DSL.sort = DSL.sort || [];
       DSL.sort.push({
-        [field]: { order: order || 'desc' },
+        [field]: { order: order || desc_sort },
       });
     }
     return DSL;
@@ -149,6 +153,13 @@ class baseController extends Controller {
         ctx.query.order
       );
     }
+
+    if (!fields) {
+      fields = [];
+      if (ctx.query.q) fields.push(score_field);
+      fields.push(updated_at_field);
+    }
+
     for (const field of fields) {
       if (Object(field) instanceof String) {
         DSL = this.add_sort_DSL(DSL, field);
@@ -167,7 +178,7 @@ class baseController extends Controller {
   }
 
   // api for ranking such as hot, latest, etc
-  async rank(field, order = 'desc') {
+  async rank(field, order = desc_sort) {
     const DSL = this.get_rank_DSL(field, order);
     await this.search(DSL);
   }
