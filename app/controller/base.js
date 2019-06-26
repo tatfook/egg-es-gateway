@@ -1,6 +1,7 @@
 'use strict';
 
 const Controller = require('egg').Controller;
+const _ = require('lodash');
 
 const suggestions_rule = {
   prefix: 'string',
@@ -12,7 +13,7 @@ const bulk_rule = {
 
 const score_field = '_score';
 const updated_at_field = 'updated_at';
-const desc_sort = 'desc';
+const DESC_ORDER = 'desc';
 
 class baseController extends Controller {
   add_location(payload, data_type, index_only) {
@@ -138,29 +139,22 @@ class baseController extends Controller {
     if (field) {
       DSL.sort = DSL.sort || [];
       DSL.sort.push({
-        [field]: { order: order || desc_sort },
+        [field]: { order: order || DESC_ORDER },
       });
     }
     return DSL;
   }
 
-  add_multi_sort_DSL(DSL = {}, fields) {
-    const { ctx } = this;
-    if (!DSL.sort) {
-      DSL = this.add_sort_DSL(
-        DSL,
-        ctx.query.sort,
-        ctx.query.order
-      );
+  preset_sort_DSL(DSL = {}, fields = []) {
+    const { sort, order } = this.ctx.params;
+    if (_.isEmpty(DSL.sort)) {
+      this.add_fields_to_sort(DSL, fields);
+      DSL = this.add_sort_DSL(DSL, sort, order);
     }
+  }
 
-    if (!fields) {
-      fields = [];
-      if (ctx.query.q) fields.push(score_field);
-      fields.push(updated_at_field);
-    }
-
-    for (const field of fields) {
+  add_fields_to_sort(DSL = {}, fields = []) {
+    fields.forEach(field => {
       if (Object(field) instanceof String) {
         DSL = this.add_sort_DSL(DSL, field);
       } else if (field instanceof Object) {
@@ -169,7 +163,21 @@ class baseController extends Controller {
           DSL = this.add_sort_DSL(DSL, field, order);
         }
       }
+    });
+  }
+
+  set_default_sort_if_empty(DSL, fields) {
+    const { ctx } = this;
+    if (_.isEmpty(fields)) {
+      if (ctx.query.q) fields.push(score_field);
+      fields.push(updated_at_field);
     }
+  }
+
+  add_multi_sort_DSL(DSL = {}, fields = []) {
+    this.preset_sort_DSL(DSL);
+    this.set_default_sort_if_empty(DSL, fields);
+    this.add_fields_to_sort(DSL, fields);
     return DSL;
   }
 
@@ -178,7 +186,7 @@ class baseController extends Controller {
   }
 
   // api for ranking such as hot, latest, etc
-  async rank(field, order = desc_sort) {
+  async rank(field, order = DESC_ORDER) {
     const DSL = this.get_rank_DSL(field, order);
     await this.search(DSL);
   }

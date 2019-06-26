@@ -130,9 +130,12 @@ class ProjectController extends Controller {
 
   get_search_DSL() {
     const DSL = {};
+    const { q } = this.ctx.params;
     this.add_query_DSL(DSL);
     this.add_highlight_DSL(DSL, 'id', 'name', 'username');
+    if (!q) this.preset_sort_DSL(DSL, [ 'cover.keyword', 'video.keyword' ]);
     this.add_multi_sort_DSL(DSL);
+    console.dir(DSL);
     return DSL;
   }
 
