@@ -130,10 +130,8 @@ class ProjectController extends Controller {
 
   get_search_DSL() {
     const DSL = {};
-    const { q } = this.ctx.params;
     this.add_query_DSL(DSL);
     this.add_highlight_DSL(DSL, 'id', 'name', 'username');
-    if (!q) this.preset_sort_DSL(DSL, [ 'cover.keyword', 'video.keyword' ]);
     this.add_multi_sort_DSL(DSL);
     console.dir(DSL);
     return DSL;
@@ -147,7 +145,19 @@ class ProjectController extends Controller {
     return DSL;
   }
 
-  get_should_query() {
+  get_default_should_query() {
+    let should;
+    const { q } = this.ctx.params;
+    if (!q) {
+      should = [
+        { exists: { field: 'cover' } },
+        { exists: { field: 'video' } },
+      ];
+    }
+    return should;
+  }
+
+  get_should_bool_query() {
     const { ctx, max_expansions } = this;
     const q = ctx.query.q;
     let should;
@@ -174,13 +184,15 @@ class ProjectController extends Controller {
           } }
         );
       }
+    } else {
+      should = this.get_default_should_query();
     }
     return should;
   }
 
   get_must_query() {
     const must = [];
-    const should = this.get_should_query();
+    const should = this.get_should_bool_query();
     const { type, tags, recruiting, recommended } = this.ctx.query;
     if (should) must.push({ bool: { should } });
     if (type) must.push({ term: { type } });
