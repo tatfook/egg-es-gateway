@@ -12,8 +12,9 @@
     "egg-validate": "^1.0.0",
     "elasticsearch": "^14.2.2",
     "keepwork-jwt-simple": "^1.0.0",
-    "pinyin": "2.8.3",
-    "lodash": "^4.17.11"
+    "lodash": "^4.17.11",
+    "newrelic": "^5.11.0",
+    "pinyin": "2.8.3"
   },
   "devDependencies": {
     "autod": "^3.0.1",
@@ -23,7 +24,8 @@
     "egg-mock": "^3.14.0",
     "eslint": "^4.11.0",
     "eslint-config-egg": "^6.0.0",
-    "faker": "^4.1.0"
+    "faker": "^4.1.0",
+    "koa-router": "^7.4.0"
   },
   "engines": {
     "node": ">=8.9.0"
