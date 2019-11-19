@@ -132,7 +132,7 @@ class ProjectController extends Controller {
   get_search_DSL() {
     const DSL = {};
     this.add_query_DSL(DSL);
-    this.add_highlight_DSL(DSL, 'id', 'name', 'username');
+    this.add_highlight_DSL(DSL, 'id', 'name', 'username', 'world_tag_name');
     this.add_multi_sort_DSL(DSL);
     console.dir(DSL);
     return DSL;
@@ -169,19 +169,28 @@ class ProjectController extends Controller {
       }
       should.push(
         { term: { 'name.keyword': { value: q, boost: 3 } } },
+        { term: { 'world_tag_name.keyword': { value: q, boost: 3 } } },
         { prefix: { username: { value: q, boost: 2 } } },
         { match_phrase_prefix: {
           name: { query: q, max_expansions, boost: 2 },
         } },
-        { wildcard: { name: `*${q}*` } }
+        { match_phrase_prefix: {
+          world_tag_name: { query: q, max_expansions, boost: 2 },
+        } },
+        { wildcard: { name: `*${q}*` } },
+        { wildcard: { world_tag_name: `*${q}*` } }
       );
 
       if (q.includes(' ')) {
         const filtered = ctx.helper.filterSubStr(q, ' ');
         should.push(
           { term: { 'name.keyword': { value: filtered, boost: 3 } } },
+          { term: { 'world_tag_name.keyword': { value: filtered, boost: 3 } } },
           { match_phrase_prefix: {
             name: { query: filtered, max_expansions, boost: 2 },
+          } },
+          { match_phrase_prefix: {
+            world_tag_name: { query: filtered, max_expansions, boost: 2 },
           } }
         );
       }
