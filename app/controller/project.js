@@ -53,6 +53,7 @@ const upsert_rule = {
   recent_view: { type: 'int', required: false },
   created_at: 'string',
   updated_at: { type: 'string', required: false },
+  world_tag_name: { type: 'string', required: false },
 };
 
 class ProjectController extends Controller {
@@ -107,12 +108,12 @@ class ProjectController extends Controller {
       'visibility', 'type', 'recruiting', 'tags', 'total_like',
       'total_view', 'total_mark', 'total_comment', 'recent_like',
       'recent_view', 'video', 'id', 'recommended', 'created_at',
-      'updated_at', 'sys_tags', 'point'
+      'updated_at', 'sys_tags', 'point', 'world_tag_name'
     );
     data.updated_at = data.updated_at || data.created_at;
     const payload = { id, body: data };
     await super.upsert(payload);
-    this.save_suggestions(data.name);
+    this.save_suggestions(data.name, data.world_tag_name);
   }
 
   add_location(payload) {
