@@ -53,6 +53,7 @@ const upsert_rule = {
   recent_view: { type: 'int', required: false },
   created_at: 'string',
   updated_at: { type: 'string', required: false },
+  world_tag_name: { type: 'string', required: false },
 };
 
 class ProjectController extends Controller {
@@ -107,12 +108,12 @@ class ProjectController extends Controller {
       'visibility', 'type', 'recruiting', 'tags', 'total_like',
       'total_view', 'total_mark', 'total_comment', 'recent_like',
       'recent_view', 'video', 'id', 'recommended', 'created_at',
-      'updated_at', 'sys_tags', 'point'
+      'updated_at', 'sys_tags', 'point', 'world_tag_name'
     );
     data.updated_at = data.updated_at || data.created_at;
     const payload = { id, body: data };
     await super.upsert(payload);
-    this.save_suggestions(data.name);
+    this.save_suggestions(data.name, data.world_tag_name);
   }
 
   add_location(payload) {
@@ -131,7 +132,7 @@ class ProjectController extends Controller {
   get_search_DSL() {
     const DSL = {};
     this.add_query_DSL(DSL);
-    this.add_highlight_DSL(DSL, 'id', 'name', 'username');
+    this.add_highlight_DSL(DSL, 'id', 'name', 'username', 'world_tag_name');
     this.add_multi_sort_DSL(DSL);
     console.dir(DSL);
     return DSL;
@@ -168,19 +169,28 @@ class ProjectController extends Controller {
       }
       should.push(
         { term: { 'name.keyword': { value: q, boost: 3 } } },
+        { term: { 'world_tag_name.keyword': { value: q, boost: 3 } } },
         { prefix: { username: { value: q, boost: 2 } } },
         { match_phrase_prefix: {
           name: { query: q, max_expansions, boost: 2 },
         } },
-        { wildcard: { name: `*${q}*` } }
+        { match_phrase_prefix: {
+          world_tag_name: { query: q, max_expansions, boost: 2 },
+        } },
+        { wildcard: { name: `*${q}*` } },
+        { wildcard: { world_tag_name: `*${q}*` } }
       );
 
       if (q.includes(' ')) {
         const filtered = ctx.helper.filterSubStr(q, ' ');
         should.push(
           { term: { 'name.keyword': { value: filtered, boost: 3 } } },
+          { term: { 'world_tag_name.keyword': { value: filtered, boost: 3 } } },
           { match_phrase_prefix: {
             name: { query: filtered, max_expansions, boost: 2 },
+          } },
+          { match_phrase_prefix: {
+            world_tag_name: { query: filtered, max_expansions, boost: 2 },
           } }
         );
       }
