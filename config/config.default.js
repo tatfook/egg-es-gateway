@@ -3,30 +3,30 @@
 const error_handler = require('./error_handler');
 
 module.exports = () => {
-  const config = exports = {};
+    const config = (exports = {});
 
-  // add your config here
-  config.middleware = [ 'jwt' ];
+    // add your config here
+    config.middleware = [ 'jwt' ];
 
-  // error handler
-  config.onerror = error_handler;
+    // error handler
+    config.onerror = error_handler;
 
-  config.bodyParser = {
-    enable: true,
-    jsonLimit: '10mb',
-    formLimit: '10mb',
-  };
+    config.bodyParser = {
+        enable: true,
+        jsonLimit: '10mb',
+        formLimit: '10mb',
+    };
 
-  config.security = {
-    csrf: {
-      enable: false,
-    },
-  };
+    config.security = {
+        csrf: {
+            enable: false,
+        },
+    };
 
-  config.cors = {
-    origin: '*',
-    allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH,OPTIONS',
-  };
+    config.cors = {
+        origin: '*',
+        allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH,OPTIONS',
+    };
 
-  return config;
+    return config;
 };

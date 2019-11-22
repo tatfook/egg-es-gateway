@@ -7,16 +7,16 @@ const runMockServer = require('./mock-server/server');
 let mockServer;
 
 before(async () => {
-  await app.ready();
+    await app.ready();
 
-  const mockServerConfig = app.config.mockServer;
-  mockServer = await runMockServer(mockServerConfig);
+    const mockServerConfig = app.config.mockServer;
+    mockServer = await runMockServer(mockServerConfig);
 
-  const secret = app.config.jwt.secret;
-  const token = `Bearer ${jwt.encode({ roleId: 10 }, secret, 'HS1')}`;
-  app.auth_header = { Authorization: token };
+    const secret = app.config.jwt.secret;
+    const token = `Bearer ${jwt.encode({ roleId: 10 }, secret, 'HS1')}`;
+    app.auth_header = { Authorization: token };
 });
 
 after(() => {
-  mockServer.close();
+    mockServer.close();
 });
