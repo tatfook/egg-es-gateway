@@ -179,7 +179,6 @@ class ProjectController extends Controller {
         this.add_query_DSL(DSL);
         this.add_highlight_DSL(DSL, 'id', 'name', 'username', 'world_tag_name');
         this.add_multi_sort_DSL(DSL);
-        console.dir(DSL);
         return DSL;
     }
 
