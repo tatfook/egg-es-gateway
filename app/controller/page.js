@@ -9,7 +9,7 @@ const create_rule = {
     username: 'string',
     title: 'string',
     visibility: [ 'public', 'private' ],
-    content: 'string',
+    content: { type: 'string', required: false, allowEmpty: true },
     created_at: 'string',
 };
 
