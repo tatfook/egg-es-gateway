@@ -8,7 +8,7 @@ module.exports = {
         return pinyin(han, { style: pinyin.STYLE_NORMAL }).join('');
     },
     paginate(query) {
-        const size = Number(query.per_page) || 20;
+        const size = Number(query.per_page) || 20; // eslint-disable-line
         const page = Number(query.page) || 1;
         const from = (page - 1) * size;
         return [ from, size ];

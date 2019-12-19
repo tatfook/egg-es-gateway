@@ -1,3 +1,4 @@
+/* eslint-disable no-magic-numbers */
 'use strict';
 
 const Controller = require('egg').Controller;
@@ -24,30 +25,25 @@ class baseController extends Controller {
         }
         return payload;
     }
-
     async index() {
         await this.search();
     }
 
     async search(DSL = this.get_search_DSL()) {
         const { ctx, service } = this;
-        const [ from, size ] = ctx.helper.paginate(ctx.query);
+        const [from, size] = ctx.helper.paginate(ctx.query);
         const query = { from, size, body: DSL };
         const query_with_location = this.add_location(query);
-        const result = await service.es.client
-            .search(query_with_location)
-            .catch(err => this.error(err));
+        const result = await service.es.client.search(query_with_location);
         ctx.body = this.wrap_search_result(result);
     }
 
     async show() {
         const { ctx, service } = this;
         ctx.ensureAdmin();
-        const query = { id: ctx.params.id };
+        const query = { id: ctx.getParams().id };
         const query_with_location = this.add_location(query);
-        const res = await service.es.client
-            .get(query_with_location)
-            .catch(err => this.error(err));
+        const res = await service.es.client.get(query_with_location);
         ctx.body = res._source;
     }
 
@@ -55,9 +51,7 @@ class baseController extends Controller {
         const { ctx, service } = this;
         ctx.ensureAdmin();
         const payload_with_location = this.add_location(payload);
-        await service.es.client
-            .create(payload_with_location)
-            .catch(err => this.error(err));
+        await service.es.client.create(payload_with_location);
         this.created();
     }
 
@@ -65,9 +59,7 @@ class baseController extends Controller {
         const { ctx, service } = this;
         ctx.ensureAdmin();
         const payload_with_location = this.add_location(payload);
-        await service.es.client
-            .update(payload_with_location)
-            .catch(err => this.error(err));
+        await service.es.client.update(payload_with_location);
         this.updated();
     }
 
@@ -75,20 +67,16 @@ class baseController extends Controller {
         const { ctx, service } = this;
         ctx.ensureAdmin();
         const payload_with_location = this.add_location(payload);
-        await service.es.client
-            .index(payload_with_location)
-            .catch(err => this.error(err));
+        await service.es.client.index(payload_with_location);
         this.upserted();
     }
 
     async destroy() {
         const { ctx, service } = this;
         ctx.ensureAdmin();
-        const query = { id: ctx.params.id };
+        const query = { id: ctx.getParams().id };
         const query_with_location = this.add_location(query);
-        await service.es.client
-            .delete(query_with_location)
-            .catch(err => this.error(err));
+        await service.es.client.delete(query_with_location);
         this.deleted();
     }
 
@@ -96,14 +84,8 @@ class baseController extends Controller {
         const { ctx, service } = this;
         ctx.validate(bulk_rule);
         ctx.ensureAdmin();
-        const params = {
-            body: ctx.params.body,
-            type: ctx.params.type,
-            index: ctx.params.index,
-        };
-        const response = await service.es.client
-            .bulk(params)
-            .catch(err => this.error(err));
+        const { body, type, index } = ctx.getParams();
+        const response = await service.es.client.bulk({ body, type, index });
         ctx.body = response;
     }
 
@@ -126,19 +108,14 @@ class baseController extends Controller {
         const { ctx } = this;
         const query_length = ctx.query.q;
         let max_expansions;
-        switch (true) {
-        case query_length > 36:
+        if (query_length > 36) {
             max_expansions = 10;
-            break;
-        case query_length > 12:
+        } else if (query_length > 12) {
             max_expansions = Math.floor(query_length / 4) + 1;
-            break;
-        case query_length > 3:
+        } else if (query_length > 3) {
             max_expansions = Math.floor(query_length / 3);
-            break;
-        default:
+        } else {
             max_expansions = 1;
-            break;
         }
         return max_expansions;
     }
@@ -159,7 +136,7 @@ class baseController extends Controller {
     }
 
     preset_sort_DSL(DSL = {}, fields = []) {
-        const { sort, order } = this.ctx.params;
+        const { sort, order } = this.ctx.getParams();
         if (_.isEmpty(DSL.sort)) {
             this.add_fields_to_sort(DSL, fields);
             DSL = this.add_sort_DSL(DSL, sort, order);
@@ -225,9 +202,7 @@ class baseController extends Controller {
             },
             index: 'suggestions',
         };
-        const result = await service.es.client
-            .suggest(query)
-            .catch(err => this.error(err));
+        const result = await service.es.client.suggest(query);
         ctx.body = this.wrap_suggestions(result);
     }
 
@@ -250,7 +225,7 @@ class baseController extends Controller {
                         body: {
                             keyword,
                             pinyin,
-                            suggestions: [ keyword, pinyin ],
+                            suggestions: [keyword, pinyin],
                         },
                     })
                     .catch(err => {
@@ -296,12 +271,6 @@ class baseController extends Controller {
 
     moved() {
         this.success('moved');
-    }
-
-    error(err) {
-        const { ctx } = this;
-        ctx.logger.error(err);
-        ctx.throw(err.statusCode);
     }
 }
 

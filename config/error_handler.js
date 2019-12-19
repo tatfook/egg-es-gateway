@@ -38,6 +38,11 @@ class ErrorHandler {
             error: 'An unknown error happened',
         };
     }
+
+    static ValidationError(err, ctx) {
+        ctx.body = JSON.stringify(err.errors);
+        ctx.status = 422;
+    }
 }
 
 module.exports = {

@@ -30,7 +30,10 @@ module.exports = app => {
     router.get('/hots/projects', project.hots);
     router.get('/likes/projects', project.likes);
 
-    router.put('/sites/:username/:sitename/visibility', page.update_visibility);
+    router.put(
+        '/sites/:username/:sitename/visibility',
+        page.update_site_visibility
+    );
     router.del('/sites/:username/:sitename', page.destroy_site);
     router.post(
         '/sites/:username/:sitename/rename_folder',
