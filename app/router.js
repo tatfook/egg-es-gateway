@@ -32,5 +32,9 @@ module.exports = app => {
 
     router.put('/sites/:username/:sitename/visibility', page.update_visibility);
     router.del('/sites/:username/:sitename', page.destroy_site);
+    router.post(
+        '/sites/:username/:sitename/rename_folder',
+        page.update_folder_path
+    );
     router.resources('/pages', page);
 };

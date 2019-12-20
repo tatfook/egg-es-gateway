@@ -37,6 +37,18 @@ describe('test/app/controller/page.test.js', () => {
             .expect(200);
     });
 
+    it('should POST /sites/:username/:sitename/rename_folder', () => {
+        return app
+            .httpRequest()
+            .post(`/sites/${username}/${sitename}/rename_folder`)
+            .set(app.auth_header)
+            .send({
+                folder: faker.internet.domainName(),
+                new_folder: faker.internet.domainName(),
+            })
+            .expect(200);
+    });
+
     it('should POST /pages', () => {
         return app
             .httpRequest()

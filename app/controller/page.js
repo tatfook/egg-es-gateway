@@ -9,7 +9,7 @@ const create_rule = {
     username: 'string',
     title: 'string',
     visibility: [ 'public', 'private' ],
-    content: 'string',
+    content: { type: 'string', required: false, allowEmpty: true },
     created_at: 'string',
 };
 
@@ -34,6 +34,13 @@ const update_site_visibility_rule = {
     sitename: 'string',
     username: 'string',
     visibility: [ 'public', 'private' ],
+};
+
+const update_folder_rule = {
+    sitename: 'string',
+    username: 'string',
+    folder: 'string',
+    new_folder: 'string',
 };
 
 class PagesController extends Controller {
@@ -99,6 +106,18 @@ class PagesController extends Controller {
         ctx.body = response;
     }
 
+    async update_folder_path() {
+        const { ctx, service } = this;
+        ctx.ensureAdmin();
+        ctx.validate(update_folder_rule, ctx.params);
+        const query = { body: this.get_update_folder_DSL() };
+        const query_with_location = this.add_location(query);
+        const response = await service.es.client
+            .updateByQuery(query_with_location)
+            .catch(err => this.error(err));
+        ctx.body = response;
+    }
+
     get_site_DSL() {
         const DSL = {};
         this.add_site_query_DSL(DSL);
@@ -111,10 +130,30 @@ class PagesController extends Controller {
         return DSL;
     }
 
+    get_update_folder_DSL() {
+        const DSL = this.get_site_DSL();
+        this.add_update_folder_DSL(DSL);
+        return DSL;
+    }
+
     add_update_visibility_DSL(DSL) {
-        const { ctx } = this;
+        const visibility = this.ctx.params.visibility;
         DSL.script = {
-            source: `ctx._source.visibility = "${ctx.params.visibility}"`,
+            source: `ctx._source.visibility = "${visibility}"`,
+            lang: 'painless',
+        };
+        return DSL;
+    }
+
+    add_update_folder_DSL(DSL) {
+        const { folder, new_folder } = this.ctx.params;
+        DSL.query.bool.must.push({
+            match_phrase_prefix: {
+                url: folder,
+            },
+        });
+        DSL.script = {
+            source: `ctx._source.url = ctx._source.url.replace("${folder}", "${new_folder}")`,
             lang: 'painless',
         };
         return DSL;
