@@ -11,22 +11,16 @@ module.exports = app => {
     }
 
     const { base, user, project, page } = controller;
-    const lesson = controller.package;
 
     router.get('/', controller.home.index);
 
     router.post('/bulk', base.bulk);
-    router.get('/suggestions', project.suggest);
 
     router.resources('/users', user);
-    router.post('/users/:id/upsert', user.upsert);
-
-    router.resources('/packages', lesson);
-    router.post('/packages/:id/upsert', lesson.upsert);
-    router.get('/hots/packages', lesson.hots);
+    router.post('/users/upsert', user.upsert);
 
     router.resources('/projects', project);
-    router.post('/projects/:id/upsert', project.upsert);
+    router.post('/projects/upsert', project.upsert);
     router.get('/hots/projects', project.hots);
     router.get('/likes/projects', project.likes);
 

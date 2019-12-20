@@ -10,7 +10,7 @@ module.exports = (app, data) => {
     };
 
     router.post('/:index/:type/_search', ctx => {
-        const { index } = ctx.getParams();
+        const { index } = ctx.params;
         const resources = data[index] || [];
         ctx.body = {
             timeout: false,

@@ -11,7 +11,7 @@ module.exports = {
         const size = Number(query.per_page) || 20; // eslint-disable-line
         const page = Number(query.page) || 1;
         const from = (page - 1) * size;
-        return [ from, size ];
+        return [from, size];
     },
     to_sha1(str) {
         const hasher = crypto.createHash('sha1');

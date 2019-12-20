@@ -8,13 +8,13 @@ describe('test/app/controller/project.test.js', () => {
         id: faker.random.number(),
         name: faker.name.title(),
         username: faker.name.firstName(),
-        visibility: faker.helpers.randomize([ 'public', 'private' ]),
-        type: faker.helpers.randomize([ 'website', 'paracraft' ]),
+        visibility: faker.helpers.randomize(['public', 'private']),
+        type: faker.helpers.randomize(['website', 'paracraft']),
         cover: faker.internet.avatar(),
         recruiting: faker.random.boolean(),
         recommended: faker.random.boolean(),
-        tags: [ 'game' ],
-        sys_tags: [ 'game' ],
+        tags: ['game'],
+        sys_tags: ['game'],
         description: faker.lorem.text(),
         point: faker.random.number({ min: 70, max: 100 }),
         total_like: faker.random.number(),
@@ -53,10 +53,10 @@ describe('test/app/controller/project.test.js', () => {
             .expect(200);
     });
 
-    it('should post /projects/:id/upsert', () => {
+    it('should post /projects/upsert', () => {
         return app
             .httpRequest()
-            .post(`/projects/${project.id}/upsert`)
+            .post('/projects/upsert')
             .set(app.auth_header)
             .send(project)
             .expect(200);

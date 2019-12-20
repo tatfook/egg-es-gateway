@@ -1,14 +1,13 @@
 'use strict';
+const { ValidationError } = require('egg-ajv/error');
 
 class ErrorHandler {
     static handle(err, ctx) {
-        try {
-            ctx.logger.error(err.name);
-            this[err.name](err, ctx);
-        } catch (handlerNotFoundError) {
-            ctx.logger.error(handlerNotFoundError);
-            this.InternalServerError(err, ctx);
-        }
+        if (err instanceof ValidationError) {
+            ctx.body = JSON.stringify(err.errors);
+            ctx.status = 422;
+        } else if (err.name && this[err.name]) this[err.name](err, ctx);
+        else this.InternalServerError(err, ctx);
     }
 
     static UnprocessableEntityError(err, ctx) {
@@ -35,13 +34,8 @@ class ErrorHandler {
     static InternalServerError(err, ctx) {
         ctx.status = 500;
         ctx.body = {
-            error: 'An unknown error happened',
+            error: err.message,
         };
-    }
-
-    static ValidationError(err, ctx) {
-        ctx.body = JSON.stringify(err.errors);
-        ctx.status = 422;
     }
 }
 
