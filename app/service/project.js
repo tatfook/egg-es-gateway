@@ -3,6 +3,10 @@
 const Service = require('egg').Service;
 
 class ProjectService extends Service {
+    get invisible_DSL() {
+        return { term: { visibility: 'private' } };
+    }
+
     add_location(payload) {
         const data_type = 'project';
         return this.ctx.service.dsl.add_location(payload, data_type);
