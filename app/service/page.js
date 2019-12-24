@@ -4,6 +4,10 @@ const Service = require('egg').Service;
 const _ = require('lodash');
 
 class PageService extends Service {
+    get invisible_DSL() {
+        return { term: { visibility: 'private' } };
+    }
+
     async isPageExist(url) {
         const payload = {
             body: {
