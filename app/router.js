@@ -17,10 +17,10 @@ module.exports = app => {
     router.post('/bulk', base.bulk);
 
     router.resources('/users', user);
-    router.post('/users/upsert', user.upsert);
+    router.post('/users/:id/upsert', user.upsert);
 
     router.resources('/projects', project);
-    router.post('/projects/upsert', project.upsert);
+    router.post('/projects/:id/upsert', project.upsert);
     router.get('/hots/projects', project.hots);
     router.get('/likes/projects', project.likes);
 
