@@ -138,7 +138,7 @@ class PageService extends Service {
                 hit._source.highlight = hit.highlight;
                 hit._source.id = undefined;
                 // eslint-disable-next-line no-magic-numbers
-                hit._source.content = (hit.content || '').slice(0, 150);
+                hit._source.content = (hit._source.content || '').slice(0, 150);
                 return hit._source;
             }),
             total: result.hits.total,
