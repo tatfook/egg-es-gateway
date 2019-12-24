@@ -23,7 +23,7 @@ describe('test/app/extend/helper.test.js', () => {
             per_page: 10,
             page: 2,
         };
-        const expected = [ 10, 10 ];
+        const expected = [10, 10];
         assert(_.isEqual(helper.paginate(query), expected));
     });
 

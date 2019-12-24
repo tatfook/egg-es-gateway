@@ -1,7 +1,8 @@
 'use strict';
+const _ = require('lodash');
 
 const isAdmin = user => {
-    return user.roleId === 10;
+    return user.roleId === 10; //eslint-disable-line
 };
 
 module.exports = {
@@ -15,5 +16,8 @@ module.exports = {
             this.throw(401, errMsg);
         }
         this.user = this.state.user;
+    },
+    getParams() {
+        return _.merge({}, this.request.body, this.query, this.params);
     },
 };
