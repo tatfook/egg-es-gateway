@@ -2735,13 +2735,6 @@ egg-onerror@^2.1.0:
     mustache "^2.3.0"
     stack-trace "^0.0.10"
 
-egg-parameters@^0.1.0:
-  version "0.1.2"
-  resolved "https://registry.npm.taobao.org/egg-parameters/download/egg-parameters-0.1.2.tgz#0b6b0b619381f2d397703a50957109a0dc0c053c"
-  integrity sha1-C2sLYZOB8tOXcDpQlXEJoNwMBTw=
-  dependencies:
-    underscore "^1.9.0"
-
 egg-path-matching@^1.0.0, egg-path-matching@^1.0.1:
   version "1.0.1"
   resolved "https://registry.npm.taobao.org/egg-path-matching/download/egg-path-matching-1.0.1.tgz#ccfc4e408acd1cf94a7f672fb8c969e456883913"
@@ -7147,11 +7140,6 @@ uid-safe@2.1.5:
   integrity sha1-Kz1cckDo/C5Y+Komnl7knAhXvTo=
   dependencies:
     random-bytes "~1.0.0"
-
-underscore@^1.9.0:
-  version "1.9.1"
-  resolved "https://registry.npm.taobao.org/underscore/download/underscore-1.9.1.tgz#06dce34a0e68a7babc29b365b8e74b8925203961"
-  integrity sha1-BtzjSg5op7q8KbNluOdLiSUgOWE=
 
 unescape@^1.0.1:
   version "1.0.1"

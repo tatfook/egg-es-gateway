@@ -6,13 +6,13 @@ const uuid = require('uuid/v4');
 class PagesController extends Controller {
     async index() {
         const { ctx, service } = this;
-        if (!ctx.params.q) {
-            ctx.body = {
-                total: 0,
-                hits: [],
-            };
-            return;
-        }
+        // if (!ctx.query.q) {
+        //     ctx.body = {
+        //         total: 0,
+        //         hits: [],
+        //     };
+        //     return;
+        // }
         const [from, size] = ctx.helper.paginate(ctx.query);
         const query = { from, size, body: ctx.service.page.get_search_DSL() };
         const query_with_location = ctx.service.page.add_location(query);
