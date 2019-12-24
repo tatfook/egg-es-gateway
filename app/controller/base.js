@@ -3,14 +3,10 @@
 
 const Controller = require('egg').Controller;
 
-const bulk_rule = {
-    body: 'array',
-};
 
 class baseController extends Controller {
     async bulk() {
         const { ctx, service } = this;
-        ctx.validate(bulk_rule);
         ctx.ensureAdmin();
         const { body, type, index } = ctx.getParams();
         const response = await service.es.client.bulk({ body, type, index });
