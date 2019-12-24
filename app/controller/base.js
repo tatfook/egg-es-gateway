@@ -3,7 +3,6 @@
 
 const Controller = require('egg').Controller;
 
-
 class baseController extends Controller {
     async bulk() {
         const { ctx, service } = this;
