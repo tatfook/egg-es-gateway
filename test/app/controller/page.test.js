@@ -13,7 +13,7 @@ describe('test/app/controller/page.test.js', () => {
         url: faker.internet.url(),
         site: faker.internet.domainName(),
         username: faker.internet.userName(),
-        visibility: faker.helpers.randomize([ 'private', 'public' ]),
+        visibility: faker.helpers.randomize(['private', 'public']),
         content: faker.lorem.text(),
         created_at: faker.date.past(),
         updated_at: faker.date.past(),
@@ -84,6 +84,5 @@ describe('test/app/controller/page.test.js', () => {
         const result = res.body;
         assert(result);
         assert(result.hits);
-        assert(result.total);
     });
 });

@@ -6,7 +6,7 @@ module.exports = () => {
     const config = (exports = {});
 
     // add your config here
-    config.middleware = [ 'jwt' ];
+    config.middleware = ['jwt'];
 
     // error handler
     config.onerror = error_handler;
@@ -26,6 +26,11 @@ module.exports = () => {
     config.cors = {
         origin: '*',
         allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH,OPTIONS',
+    };
+
+    config.ajv = {
+        keyword: 'validator',
+        removeAdditional: true,
     };
 
     return config;
