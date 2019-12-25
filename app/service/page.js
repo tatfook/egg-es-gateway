@@ -12,7 +12,7 @@ class PageService extends Service {
         const payload = {
             body: {
                 query: {
-                    match_phrase: { url },
+                    term: { 'url.keyword': url },
                 },
             },
         };
@@ -33,7 +33,10 @@ class PageService extends Service {
         const { sitename, username } = this.ctx.getParams();
         DSL.query = {
             bool: {
-                must: [{ term: { username } }, { term: { site: sitename } }],
+                must: [
+                    { term: { 'username.keyword': username } },
+                    { term: { 'site.keyword': sitename } },
+                ],
             },
         };
         return DSL;
@@ -42,7 +45,7 @@ class PageService extends Service {
     get_page_DSL(DSL = {}) {
         const url = this.ctx.getParams().id; // use url as id, not the document id
         DSL.query = {
-            match_phrase: { url },
+            term: { 'url.keyword': url },
         };
         return DSL;
     }
@@ -88,6 +91,7 @@ class PageService extends Service {
     get_search_DSL() {
         let DSL = {};
         DSL = this.add_query_DSL(DSL);
+        DSL = this.add_source_DSL(DSL);
         DSL = this.ctx.service.dsl.add_highlight_DSL(DSL, [
             'title',
             'url',
@@ -103,6 +107,13 @@ class PageService extends Service {
                 should: this.get_should_query(),
                 must_not: this.invisible_DSL,
             },
+        };
+        return DSL;
+    }
+
+    add_source_DSL(DSL = {}) {
+        DSL._source = {
+            includes: ['url', 'title', 'lite_content', 'username', 'site'],
         };
         return DSL;
     }
@@ -138,7 +149,7 @@ class PageService extends Service {
                 hit._source.highlight = hit.highlight;
                 hit._source.id = undefined;
                 // eslint-disable-next-line no-magic-numbers
-                hit._source.content = (hit._source.content || '').slice(0, 150);
+                hit._source.content = hit._source.lite_content || '';
                 return hit._source;
             }),
             total: result.hits.total,
