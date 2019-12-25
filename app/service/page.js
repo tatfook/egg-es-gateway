@@ -40,9 +40,9 @@ class PageService extends Service {
     }
 
     get_page_DSL(DSL = {}) {
-        const url = this.ctx.getParams().id; // use url as id, not the document id
+        const id = this.ctx.getParams().id; // use url as id, not the document id
         DSL.query = {
-            match_phrase: { url },
+            term: { id },
         };
         return DSL;
     }
