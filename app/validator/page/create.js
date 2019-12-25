@@ -15,6 +15,7 @@ module.exports = {
             default: 'public',
         },
         content: { type: 'string' },
+        lite_content: { type: 'string', description: '简化版content' },
         created_at: { type: 'string', mock: { mock: '@date' } },
         updated_at: { type: 'string', mock: { mock: '@date' } },
     },

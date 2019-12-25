@@ -24,6 +24,8 @@ class PagesController extends Controller {
         const { ctx, app, service } = this;
         const body = ctx.getParams();
         await ctx.validate(app.validator.page.create, body);
+        body.lite_content =
+            body.lite_content || this.getLiteContentByContent(body.content);
         body.updated_at = body.updated_at || body.created_at;
         const page = await service.page.isPageExist(body.url);
         if (page) ctx.throw('Page already exist', 409);
@@ -33,10 +35,21 @@ class PagesController extends Controller {
         this.created();
     }
 
+    getLiteContentByContent(content = '') {
+        // eslint-disable-next-line no-magic-numbers
+        if (content.length > 150) {
+            // eslint-disable-next-line no-magic-numbers
+            return content.slice(0, 150) + '...';
+        }
+        return content;
+    }
+
     async update() {
         const { ctx, app, service } = this;
         const doc = ctx.getParams();
         await ctx.validate(app.validator.page.update, doc);
+        doc.lite_content =
+            doc.lite_content || this.getLiteContentByContent(doc.content);
         const query = { body: ctx.service.page.get_update_page_DSL(doc) };
         const query_with_location = ctx.service.page.add_location(query);
         ctx.body = await service.es.client.updateByQuery(query_with_location);
