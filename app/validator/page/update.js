@@ -11,6 +11,7 @@ module.exports = {
             enum: ['public', 'private'],
         },
         content: { type: 'string' },
+        lite_content: { type: 'string', description: '简化版content' },
         updated_at: { type: 'string', mock: { mock: '@date' } },
     },
     required: ['updated_at'],
