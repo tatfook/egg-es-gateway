@@ -43,10 +43,10 @@ describe('test/app/controller/user.test.js', () => {
             .expect(200);
     });
 
-    it('should post /users/upsert', () => {
+    it('should post /users/:id/upsert', () => {
         return app
             .httpRequest()
-            .post('/users/upsert')
+            .post(`/users/${user.id}/upsert`)
             .set(app.auth_header)
             .send(user)
             .expect(200);

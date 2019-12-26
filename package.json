@@ -25,6 +25,7 @@
         "eslint-config-egg": "^6.0.0",
         "faker": "^4.1.0",
         "koa-router": "^7.4.0",
+        "mocha-jenkins-reporter": "^0.4.2",
         "pre-commit": "^1.2.2",
         "prettier": "^1.19.1"
     },
@@ -42,6 +43,7 @@
         "debug": "egg-bin debug",
         "test": "npm run lint -- --fix && npm run test-local",
         "test-local": "egg-bin test",
+        "test-jenkins": "JUNIT_REPORT_PATH=report.xml egg-bin test --colors --reporter mocha-jenkins-reporter",
         "cov": "egg-bin cov",
         "lint": "eslint . --fix",
         "ci": "npm run lint && npm run cov",
