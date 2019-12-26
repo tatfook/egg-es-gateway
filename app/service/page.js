@@ -81,10 +81,37 @@ class PageService extends Service {
                 url: folder,
             },
         });
+        // 文件名和目录名同名的情况过滤掉
+        DSL.query.bool.must_not = [
+            {
+                term: {
+                    'url.keyword': folder,
+                },
+            },
+        ];
         DSL.script = {
             source: `ctx._source.url = ctx._source.url.replace("${folder}", "${new_folder}")`,
             lang: 'painless',
         };
+        return DSL;
+    }
+
+    get_delete_folder_DSL() {
+        const DSL = this.get_site_DSL();
+        const { folderpath } = this.ctx.getParams();
+        DSL.query.bool.must.push({
+            match_phrase_prefix: {
+                url: folderpath,
+            },
+        });
+        // 文件名和目录名同名的情况过滤掉
+        DSL.query.bool.must_not = [
+            {
+                term: {
+                    'url.keyword': folderpath,
+                },
+            },
+        ];
         return DSL;
     }
 
