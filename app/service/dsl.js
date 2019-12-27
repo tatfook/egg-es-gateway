@@ -112,6 +112,15 @@ class DSLService extends Service {
         const DSL = this.add_sort_DSL({}, field, order);
         return DSL;
     }
+
+    get_query_all_DSL() {
+        const DSL = {
+            query: {
+                match_all: {},
+            },
+        };
+        return DSL;
+    }
 }
 
 module.exports = DSLService;
