@@ -13,7 +13,7 @@ class ProjectService extends Service {
     }
 
     get_rank_DSL(field, order) {
-        const DSL = this.add_sort_DSL({}, field, order);
+        const DSL = this.ctx.service.dsl.add_sort_DSL({}, field, order);
         DSL.query = {
             bool: { must_not: this.invisible_DSL },
         };

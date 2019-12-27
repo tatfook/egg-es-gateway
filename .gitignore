@@ -15,3 +15,4 @@ config.prod.js
 config.unittest.js
 newrelic_*
 typings
+report.xml

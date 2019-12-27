@@ -33,5 +33,9 @@ module.exports = app => {
         '/sites/:username/:sitename/rename_folder',
         page.update_folder_path
     );
+    router.del(
+        '/sites/:username/:sitename/folder/:folderpath',
+        page.delete_folder
+    );
     router.resources('/pages', page);
 };

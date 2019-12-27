@@ -101,6 +101,16 @@ class PagesController extends Controller {
         ctx.body = await service.es.client.updateByQuery(query_with_location);
         this.updated();
     }
+
+    async delete_folder() {
+        const { ctx, service, app } = this;
+        ctx.ensureAdmin();
+        await ctx.validate(app.validator.page.deleteFolder, ctx.getParams());
+        const query = { body: ctx.service.page.get_delete_folder_DSL() };
+        const query_with_location = ctx.service.page.add_location(query);
+        ctx.body = await service.es.client.deleteByQuery(query_with_location);
+        this.deleted();
+    }
 }
 
 module.exports = PagesController;

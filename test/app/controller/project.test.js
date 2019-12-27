@@ -53,10 +53,10 @@ describe('test/app/controller/project.test.js', () => {
             .expect(200);
     });
 
-    it('should post /projects/upsert', () => {
+    it('should post /projects/:id/upsert', () => {
         return app
             .httpRequest()
-            .post('/projects/upsert')
+            .post(`/projects/${project.id}/upsert`)
             .set(app.auth_header)
             .send(project)
             .expect(200);
