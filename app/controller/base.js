@@ -12,6 +12,19 @@ class baseController extends Controller {
         ctx.body = response;
     }
 
+    async clearIndexData() {
+        const { ctx, service } = this;
+        ctx.ensureAdmin();
+        const { index } = ctx.getParams();
+        const query = {
+            body: ctx.service.dsl.get_query_all_DSL(),
+        };
+        const resourceService = service[index]; // page, project, user
+        const query_with_location = resourceService.add_location(query);
+        ctx.body = await service.es.client.deleteByQuery(query_with_location);
+        this.deleted();
+    }
+
     success(action = 'success') {
         const { ctx } = this;
         ctx.body = {};

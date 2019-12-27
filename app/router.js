@@ -15,6 +15,7 @@ module.exports = app => {
     router.get('/', controller.home.index);
 
     router.post('/bulk', base.bulk);
+    router.delete('/clearIndexData', base.clearIndexData);
 
     router.resources('/users', user);
     router.post('/users/:id/upsert', user.upsert);
