@@ -68,7 +68,7 @@ class ProjectController extends Controller {
         ctx.ensureAdmin();
         const query = { id: ctx.getParams().id };
         const query_with_location = service.project.add_location(query);
-        ctx.body = await service.es.client.delete(query_with_location);
+        ctx.body = await service.es.safeDelete(query_with_location);
         this.deleted();
     }
 }
