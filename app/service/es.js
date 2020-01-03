@@ -15,6 +15,21 @@ module.exports = app => {
         get client() {
             return Client;
         }
+        // 安全删除，删除不存在的不报错
+        async safeDelete(DSL) {
+            try {
+                return await this.client.delete(DSL);
+            } catch (error) {
+                const notFound =
+                    error.statusCode === 404 &&
+                    error.body &&
+                    error.body.found === false;
+                if (notFound) {
+                    return {};
+                }
+                throw error;
+            }
+        }
     }
 
     return EsService;

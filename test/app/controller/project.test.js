@@ -53,6 +53,14 @@ describe('test/app/controller/project.test.js', () => {
             .expect(200);
     });
 
+    it('should delete not exist project /projects/:id', () => {
+        return app
+            .httpRequest()
+            .delete('/projects/-1')
+            .set(app.auth_header)
+            .expect(200);
+    });
+
     it('should post /projects/:id/upsert', () => {
         return app
             .httpRequest()
