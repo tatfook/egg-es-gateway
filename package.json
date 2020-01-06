@@ -4,17 +4,16 @@
     "description": "keepwork es-gateway",
     "private": true,
     "dependencies": {
-        "egg": "^2.2.1",
+        "egg": "^2.25.0",
+        "egg-ajv": "https://github.com/tatfook/egg-ajv/archive/v1.0.1.tar.gz",
         "egg-cors": "^2.0.0",
         "egg-jwt": "^3.0.0",
-        "egg-parameters": "^0.1.0",
         "egg-scripts": "^2.5.0",
-        "egg-validate": "^1.0.0",
         "elasticsearch": "^14.2.2",
         "keepwork-jwt-simple": "^1.0.0",
         "lodash": "^4.17.11",
-        "newrelic": "^5.11.0",
-        "pinyin": "2.8.3"
+        "pinyin": "2.8.3",
+        "uuid": "^3.3.3"
     },
     "devDependencies": {
         "autod": "^3.0.1",
@@ -26,6 +25,7 @@
         "eslint-config-egg": "^6.0.0",
         "faker": "^4.1.0",
         "koa-router": "^7.4.0",
+        "mocha-jenkins-reporter": "^0.4.2",
         "pre-commit": "^1.2.2",
         "prettier": "^1.19.1"
     },
@@ -43,6 +43,7 @@
         "debug": "egg-bin debug",
         "test": "npm run lint -- --fix && npm run test-local",
         "test-local": "egg-bin test",
+        "test-jenkins": "JUNIT_REPORT_PATH=report.xml egg-bin test --colors --reporter mocha-jenkins-reporter",
         "cov": "egg-bin cov",
         "lint": "eslint . --fix",
         "ci": "npm run lint && npm run cov",

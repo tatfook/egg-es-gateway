@@ -8,13 +8,13 @@ describe('test/app/controller/project.test.js', () => {
         id: faker.random.number(),
         name: faker.name.title(),
         username: faker.name.firstName(),
-        visibility: faker.helpers.randomize([ 'public', 'private' ]),
-        type: faker.helpers.randomize([ 'website', 'paracraft' ]),
+        visibility: faker.helpers.randomize(['public', 'private']),
+        type: faker.helpers.randomize(['website', 'paracraft']),
         cover: faker.internet.avatar(),
         recruiting: faker.random.boolean(),
         recommended: faker.random.boolean(),
-        tags: [ 'game' ],
-        sys_tags: [ 'game' ],
+        tags: ['game'],
+        sys_tags: ['game'],
         description: faker.lorem.text(),
         point: faker.random.number({ min: 70, max: 100 }),
         total_like: faker.random.number(),
@@ -49,6 +49,14 @@ describe('test/app/controller/project.test.js', () => {
         return app
             .httpRequest()
             .delete(`/projects/${project.id}`)
+            .set(app.auth_header)
+            .expect(200);
+    });
+
+    it('should delete not exist project /projects/:id', () => {
+        return app
+            .httpRequest()
+            .delete('/projects/-1')
             .set(app.auth_header)
             .expect(200);
     });

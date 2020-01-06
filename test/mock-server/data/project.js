@@ -4,7 +4,7 @@ const faker = require('faker');
 const _ = require('lodash');
 
 const number_limit = { min: 0, max: 1000 };
-const types = [ 'website', 'paracraft' ];
+const types = ['website', 'paracraft'];
 const total = 20;
 
 const projects = _.times(total, n => {

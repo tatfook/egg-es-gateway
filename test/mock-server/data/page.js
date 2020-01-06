@@ -4,7 +4,7 @@ const faker = require('faker');
 const _ = require('lodash');
 const total = 20;
 
-const visibility = [ 'private', 'public' ];
+const visibility = ['private', 'public'];
 
 const pages = _.times(total, n => {
     const page = {

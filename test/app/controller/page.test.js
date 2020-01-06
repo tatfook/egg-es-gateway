@@ -13,7 +13,7 @@ describe('test/app/controller/page.test.js', () => {
         url: faker.internet.url(),
         site: faker.internet.domainName(),
         username: faker.internet.userName(),
-        visibility: faker.helpers.randomize([ 'private', 'public' ]),
+        visibility: faker.helpers.randomize(['private', 'public']),
         content: faker.lorem.text(),
         created_at: faker.date.past(),
         updated_at: faker.date.past(),
@@ -34,6 +34,18 @@ describe('test/app/controller/page.test.js', () => {
             .httpRequest()
             .delete(`/sites/${username}/${sitename}`)
             .set(app.auth_header)
+            .expect(200);
+    });
+
+    it('should POST /sites/:username/:sitename/rename_folder', () => {
+        return app
+            .httpRequest()
+            .post(`/sites/${username}/${sitename}/rename_folder`)
+            .set(app.auth_header)
+            .send({
+                folder: faker.internet.domainName(),
+                new_folder: faker.internet.domainName(),
+            })
             .expect(200);
     });
 
@@ -72,6 +84,5 @@ describe('test/app/controller/page.test.js', () => {
         const result = res.body;
         assert(result);
         assert(result.hits);
-        assert(result.total);
     });
 });
