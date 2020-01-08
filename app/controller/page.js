@@ -44,10 +44,17 @@ class PagesController extends Controller {
         return content;
     }
 
+    escapeContent(content) {
+        content = content.replace(/\\/g, '\\\\');
+        content = content.replace(/"/g, '\\"');
+        return content;
+    }
+
     async update() {
         const { ctx, app, service } = this;
         const doc = ctx.getParams();
         await ctx.validate(app.validator.page.update, doc);
+        doc.content = this.escapeContent(doc.content);
         doc.lite_content =
             doc.lite_content || this.getLiteContentByContent(doc.content);
         const query = { body: ctx.service.page.get_update_page_DSL(doc) };
