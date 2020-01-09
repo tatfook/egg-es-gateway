@@ -61,8 +61,10 @@ class PagesController extends Controller {
                 payload
             );
             await service.es.client.update(payload_with_location);
+            this.updated();
+        } else {
+            this.notFound();
         }
-        this.updated();
     }
 
     async destroy() {

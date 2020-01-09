@@ -52,6 +52,16 @@ class baseController extends Controller {
     moved() {
         this.success('moved');
     }
+
+    notFound(msg) {
+        msg = msg || 'resource not found';
+        const { ctx } = this;
+        ctx.status = 404;
+        ctx.body = {
+            found: false,
+            msg,
+        };
+    }
 }
 
 module.exports = baseController;
