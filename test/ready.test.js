@@ -10,6 +10,8 @@ before(async () => {
 
     const mockServerConfig = app.config.mockServer;
     mockServer = await runMockServer(mockServerConfig);
+
+    app.authHeader = { 'x-api-key': app.config.INTERNAL_API_KEY };
 });
 
 after(() => {
