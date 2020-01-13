@@ -14,7 +14,7 @@ describe('test/app/test/controller/base.test.js', () => {
         return app
             .httpRequest()
             .post('/bulk')
-            .set(app.auth_header)
+            .query({ apiKey: app.config.INTERNAL_API_KEY })
             .send({ body, index, type })
             .expect(200);
     });

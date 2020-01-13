@@ -21,7 +21,7 @@ describe('test/app/controller/user.test.js', () => {
         return app
             .httpRequest()
             .post('/users')
-            .set(app.auth_header)
+            .query({ apiKey: app.config.INTERNAL_API_KEY })
             .send(user)
             .expect(201);
     });
@@ -30,7 +30,7 @@ describe('test/app/controller/user.test.js', () => {
         return app
             .httpRequest()
             .put(`/users/${user.id}`)
-            .set(app.auth_header)
+            .query({ apiKey: app.config.INTERNAL_API_KEY })
             .send(user)
             .expect(200);
     });
@@ -39,7 +39,7 @@ describe('test/app/controller/user.test.js', () => {
         return app
             .httpRequest()
             .delete(`/users/${user.id}`)
-            .set(app.auth_header)
+            .query({ apiKey: app.config.INTERNAL_API_KEY })
             .expect(200);
     });
 
@@ -47,7 +47,7 @@ describe('test/app/controller/user.test.js', () => {
         return app
             .httpRequest()
             .post(`/users/${user.id}/upsert`)
-            .set(app.auth_header)
+            .query({ apiKey: app.config.INTERNAL_API_KEY })
             .send(user)
             .expect(200);
     });

@@ -31,7 +31,7 @@ describe('test/app/controller/project.test.js', () => {
         return app
             .httpRequest()
             .post('/projects')
-            .set(app.auth_header)
+            .query({ apiKey: app.config.INTERNAL_API_KEY })
             .send(project)
             .expect(201);
     });
@@ -40,7 +40,7 @@ describe('test/app/controller/project.test.js', () => {
         return app
             .httpRequest()
             .put(`/projects/${project.id}`)
-            .set(app.auth_header)
+            .query({ apiKey: app.config.INTERNAL_API_KEY })
             .send(project)
             .expect(200);
     });
@@ -49,7 +49,7 @@ describe('test/app/controller/project.test.js', () => {
         return app
             .httpRequest()
             .delete(`/projects/${project.id}`)
-            .set(app.auth_header)
+            .query({ apiKey: app.config.INTERNAL_API_KEY })
             .expect(200);
     });
 
@@ -57,7 +57,7 @@ describe('test/app/controller/project.test.js', () => {
         return app
             .httpRequest()
             .post(`/projects/${project.id}/upsert`)
-            .set(app.auth_header)
+            .query({ apiKey: app.config.INTERNAL_API_KEY })
             .send(project)
             .expect(200);
     });
