@@ -24,7 +24,7 @@ describe('test/app/controller/page.test.js', () => {
         return app
             .httpRequest()
             .put(`/sites/${username}/${sitename}/visibility`)
-            .set(app.auth_header)
+            .set(app.authHeader)
             .send({ visibility })
             .expect(200);
     });
@@ -33,7 +33,7 @@ describe('test/app/controller/page.test.js', () => {
         return app
             .httpRequest()
             .delete(`/sites/${username}/${sitename}`)
-            .set(app.auth_header)
+            .set(app.authHeader)
             .expect(200);
     });
 
@@ -41,7 +41,7 @@ describe('test/app/controller/page.test.js', () => {
         return app
             .httpRequest()
             .post(`/sites/${username}/${sitename}/rename_folder`)
-            .set(app.auth_header)
+            .set(app.authHeader)
             .send({
                 folder: faker.internet.domainName(),
                 new_folder: faker.internet.domainName(),
@@ -53,7 +53,7 @@ describe('test/app/controller/page.test.js', () => {
         return app
             .httpRequest()
             .post('/users')
-            .set(app.auth_header)
+            .set(app.authHeader)
             .send(page)
             .expect(201);
     });
@@ -62,7 +62,7 @@ describe('test/app/controller/page.test.js', () => {
         return app
             .httpRequest()
             .put(`/pages/${page.id}`)
-            .set(app.auth_header)
+            .set(app.authHeader)
             .send(page)
             .expect(200);
     });
@@ -71,7 +71,7 @@ describe('test/app/controller/page.test.js', () => {
         return app
             .httpRequest()
             .delete(`/pages/${page.id}`)
-            .set(app.auth_header)
+            .set(app.authHeader)
             .expect(200);
     });
 

@@ -10,7 +10,6 @@
         "egg-jwt": "^3.0.0",
         "egg-scripts": "^2.5.0",
         "elasticsearch": "^14.2.2",
-        "keepwork-jwt-simple": "^1.0.0",
         "lodash": "^4.17.11",
         "pinyin": "2.8.3",
         "uuid": "^3.3.3"
