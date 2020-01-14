@@ -1,7 +1,6 @@
 'use strict';
 
 const Service = require('egg').Service;
-const _ = require('lodash');
 
 class PageService extends Service {
     get invisible_DSL() {
@@ -46,19 +45,6 @@ class PageService extends Service {
         const url = this.ctx.getParams().id; // use url as id, not the document id
         DSL.query = {
             term: { 'url.keyword': url },
-        };
-        return DSL;
-    }
-
-    get_update_page_DSL(doc, DSL = {}) {
-        DSL = this.get_page_DSL(DSL);
-        let source = '';
-        _.forEach(doc, (value, key) => {
-            source += `ctx._source.${key}="${value}";`;
-        });
-        DSL.script = {
-            source,
-            lang: 'painless',
         };
         return DSL;
     }
