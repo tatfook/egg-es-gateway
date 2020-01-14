@@ -43,6 +43,14 @@ describe('test/app/controller/user.test.js', () => {
             .expect(200);
     });
 
+    it('should delete not exist user /users/:id', () => {
+        return app
+            .httpRequest()
+            .delete('/users/-1')
+            .set(app.auth_header)
+            .expect(200);
+    });
+
     it('should post /users/:id/upsert', () => {
         return app
             .httpRequest()

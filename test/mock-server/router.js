@@ -21,6 +21,13 @@ module.exports = (app, data) => {
         };
     });
 
+    router.delete('/:index/:type/-1', ctx => {
+        ctx.status = 404;
+        ctx.body = {
+            found: false,
+        };
+    });
+
     router
         .all('/:index/:type', OK)
         .all('/:index/:type/:whatever', OK)

@@ -6,6 +6,13 @@ const uuid = require('uuid/v4');
 class PagesController extends Controller {
     async index() {
         const { ctx, service } = this;
+        if (!ctx.getParams().q) {
+            ctx.body = {
+                total: 0,
+                hits: [],
+            };
+            return;
+        }
         const [from, size] = ctx.helper.paginate(ctx.query);
         const query = { from, size, body: ctx.service.page.get_search_DSL() };
         const query_with_location = ctx.service.page.add_location(query);
@@ -43,10 +50,21 @@ class PagesController extends Controller {
         await ctx.validate(app.validator.page.update, doc);
         doc.lite_content =
             doc.lite_content || this.getLiteContentByContent(doc.content);
-        const query = { body: ctx.service.page.get_update_page_DSL(doc) };
+        const query = { body: ctx.service.page.get_page_DSL() };
         const query_with_location = ctx.service.page.add_location(query);
-        ctx.body = await service.es.client.updateByQuery(query_with_location);
-        this.updated();
+        // 根据url查出来id，再根据id更新数据
+        const data = await service.es.client.search(query_with_location);
+        if (data.hits.hits[0]) {
+            const id = data.hits.hits[0]._id;
+            const payload = { id, body: { doc } };
+            const payload_with_location = ctx.service.page.add_location(
+                payload
+            );
+            await service.es.client.update(payload_with_location);
+            this.updated();
+        } else {
+            this.notFound();
+        }
     }
 
     async destroy() {
