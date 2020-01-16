@@ -57,7 +57,7 @@ describe('test/app/controller/project.test.js', () => {
         return app
             .httpRequest()
             .delete('/projects/-1')
-            .set(app.auth_header)
+            .set(app.authHeader)
             .expect(200);
     });
 
