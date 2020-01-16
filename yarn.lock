@@ -4590,11 +4590,6 @@ jws@^3.2.2:
     jwa "^1.4.1"
     safe-buffer "^5.0.1"
 
-keepwork-jwt-simple@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.npm.taobao.org/keepwork-jwt-simple/download/keepwork-jwt-simple-1.0.0.tgz#7320ecb802b425a210710f267dab4ca448809832"
-  integrity sha1-cyDsuAK0JaIQcQ8mfatMpEiAmDI=
-
 keygrip@~1.1.0:
   version "1.1.0"
   resolved "https://registry.npm.taobao.org/keygrip/download/keygrip-1.1.0.tgz#871b1681d5e159c62a445b0c74b615e0917e7226"
